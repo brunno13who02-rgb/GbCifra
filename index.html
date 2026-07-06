@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GbCifra // Smart Chords System</title>
+
+<style>
+:root {
+    --bg-principal: #09090b;
+    --bg-card: rgba(20, 20, 25, 0.7);
+    --bg-surface: #121215;
+    --bg-input: #18181c;
+    --bg-input-foco: #1f1f24;
+    --cor-primaria: #00f5a0;
+    --cor-primaria-hover: #10b981;
+    --cor-acorde: #f59e0b;
+    --texto-claro: #fafafa;
+    --texto-escuro: #a1a1aa;
+    --texto-muto: #52525b;
+    --borda: rgba(255, 255, 255, 0.04);
+    --borda-foco: rgba(0, 245, 160, 0.3);
+    --cor-remover: #ef4444;
+    --cor-edicao: #3b82f6;
+    --blur-padrao: blur(16px);
+    --zoom-fonte-base: 1.15rem;
+}
+
+body.modo-claro {
+    --bg-principal: #f4f4f5;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-surface: #e4e4e7;
+    --bg-input: #ffffff;
+    --bg-input-foco: #f4f4f5;
+    --cor-primaria: #10b981;
+    --cor-primaria-hover: #059669;
+    --cor-acorde: #d97706;
+    --texto-claro: #09090b;
+    --texto-escuro: #4b5563;
+    --texto-muto: #9ca3af;
+    --borda: rgba(0, 0, 0, 0.08);
+    --borda-foco: rgba(16, 185, 129, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-principal);
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 245, 160, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(59, 130, 246, 0.02) 0%, transparent 40%);
+    color: var(--texto-claro);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 20px;
+    overflow-x: hidden;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    z-index: 1;
+}
+
+.alternador-tema-global {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: var(--bg-surface);
+    border: 1px solid var(--borda);
+    color: var(--texto-claro);
+    padding: 10px;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.tela-intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #050507;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-conteudo {
+    text-align: center;
+}
+
+.logo-subtitulo {
+    color: var(--texto-muto);
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-top: -15px;
+    margin-bottom: 40px;
+    font-weight: 600;
+}
+
+.tela {
+    display: none;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-padrao);
+    -webkit-backdrop-filter: var(--blur-padrao);
+    padding: 50px;
+    border-radius: 20px;
+    border: 1px solid var(--borda);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.tela.ativa {
+    display: block;
+    animation: premiumFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes premiumFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    text-align: center;
+    background: linear-gradient(135deg, var(--texto-claro) 30%, rgba(250,250,250,0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 40px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 30px;
+    color: var(--texto-claro);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: var(--cor-primaria);
+    border-radius: 2px;
+}
+
+button {
+    background: var(--texto-claro);
+    color: var(--bg-principal);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    background: #ffffff;
+    box-shadow: 0 10px 20px rgba(255,255,255,0.06);
+}
+
+button.secundario {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--borda);
+    color: var(--texto-claro);
+}
+button.secundario:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+button.perigo {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+button.perigo:hover {
+    background: var(--cor-remover);
+    color: #fff;
+    border-color: transparent;
+}
+
+button.info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+button.info:hover {
+    background: var(--cor-edicao);
+    color: #fff;
+    border-color: transparent;
+}
+
+button.sucesso {
+    background: var(--cor-primaria);
+    color: #030f0a;
+}
+button.sucesso:hover { 
+    background: var(--cor-primaria-hover);
+}
+
+button.whatsapp {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+button.whatsapp:hover {
+    background: #22c55e;
+    color: #fff;
+}
+
+.campo-grupo { margin-bottom: 24px; }
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--texto-escuro);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+input, textarea, select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--borda);
+    color: var(--texto-claro);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+input:focus, textarea:focus, select:focus {
+    border-color: rgba(0, 245, 160, 0.4);
+    background: var(--bg-input-foco);
+    box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.08);
+}
+
+textarea {
+    height: 180px;
+    resize: none;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.grupo-botoes-home { display: flex; flex-direction: column; gap: 16px; }
+.linha-botoes { display: flex; gap: 16px; }
+
+.btn-animado-hoje {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #fcd34d;
+    font-weight: 600;
+}
+.btn-animado-hoje:hover {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.1));
+    border-color: rgba(245, 158, 11, 0.5);
+    transform: translateY(-2px);
+}
+
+.grid-temas-cadastro {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--borda);
+}
+
+.opcao-checkbox {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--texto-escuro);
+    transition: all 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+.opcao-checkbox:hover {
+    color: var(--texto-claro);
+    background: rgba(255,255,255,0.03);
+}
+.opcao-checkbox input[type="checkbox"] { width: auto; accent-color: var(--cor-primaria); }
+
+.grid-pastas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.pasta-card {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.pasta-card h3 { font-size: 1rem; margin-bottom: 4px; font-weight: 600; color: #fff; }
+.pasta-card p { font-size: 0.8rem; color: var(--texto-escuro); }
+.pasta-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255,255,255,0.03);
+    transform: translateY(-2px);
+}
+
+.linha-musica { display: flex; flex-wrap: wrap; gap: 4px 0px; margin-bottom: 20px; }
+.palavra-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    border: 1px dashed transparent;
+    cursor: pointer;
+}
+.palavra-box:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.palavra-box.drag-over {
+    border-color: var(--cor-primaria) !important;
+    background: rgba(0, 245, 160, 0.1) !important;
+}
+
+.acorde-tag {
+    color: var(--cor-acorde);
+    font-weight: 700;
+    min-height: 22px;
+    font-size: calc(var(--zoom-fonte-base) * 0.9);
+    white-space: nowrap;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+.texto-tag { font-size: var(--zoom-fonte-base); color: rgba(255,255,255,0.85); font-family: inherit; }
+
+.ocultar-todas-cifras .acorde-tag {
+    display: none !important;
+}
+
+.seletor-acordes {
+    position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important;
+    width: 100vw !important; height: 38vh !important;
+    background: #0d0d11;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: none; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; padding: 25px;
+    overflow-y: auto; z-index: 999999 !important;
+    box-shadow: 0 -20px 40px rgba(0,0,0,0.8); border-radius: 20px 20px 0 0;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.seletor-acordes button {
+    padding: 12px 6px; font-size: 0.85rem;
+    background: rgba(255,255,255,0.03); color: var(--texto-claro);
+    border: 1px solid var(--borda); border-radius: 8px;
+    cursor: grab;
+}
+.seletor-acordes button:active { cursor: grabbing; }
+.seletor-acordes button:hover { background: var(--texto-claro); color: #000; }
+.seletor-acordes button.btn-remover { grid-column: 1 / -1; background: rgba(239, 68, 68, 0.1); color: #fca5a5; border-color: rgba(239, 68, 68, 0.2); margin-top: 8px; cursor: pointer; }
+.seletor-acordes button.btn-remover:hover { background: var(--cor-remover); color: white; }
+
+.item-busca {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--bg-surface); border: 1px solid var(--borda);
+    padding: 16px 20px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease;
+}
+.item-busca:hover { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); }
+.item-busca.arrastando { opacity: 0.3; border: 1px dashed var(--cor-primaria); }
+
+.item-acoes { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.item-acoes button { padding: 10px 12px; min-width: auto; font-size: 0.85rem; }
+
+.topo-visualizacao { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--borda); padding-bottom: 24px; margin-bottom: 30px; gap: 20px; }
+.painel-controles-mestre { display: flex; gap: 10px; flex-wrap: wrap; }
+.controles-tom, .controles-rolagem, .controles-zoom, .controles-capo, .controles-visibilidade {
+    display: flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.2); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--borda);
+}
+.controles-tom button, .controles-rolagem button, .controles-zoom button, .controles-visibilidade button {
+    padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; background: rgba(255,255,255,0.04); color: var(--texto-claro); border: 1px solid var(--borda);
+}
+.controles-tom button:hover, .controles-rolagem button:hover, .controles-zoom button:hover, .controles-visibilidade button:hover { background: rgba(255,255,255,0.12); }
+.controles-capo select { width: auto; padding: 2px 6px; background: transparent; border: none; color: var(--cor-primaria); font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+
+.btn-scroll-ativo { background: var(--cor-primaria) !important; color: #000 !important; font-weight: bold; }
+
+#view-corpo-cifra {
+    max-height: 55vh;
+    overflow-y: auto;
+    line-height: 2.6; 
+    background: rgba(0,0,0,0.2); 
+    padding: 30px; 
+    border-radius: 14px; 
+    border: 1px solid var(--borda);
+}
+
+body.modo-palco-global {
+    background: #000000 !important;
+    padding: 0 !important;
+}
+body.modo-palco-global .alternador-tema-global,
+body.modo-palco-global #splash-screen {
+    display: none !important;
+}
+body.modo-palco-global .container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+}
+body.modo-palco-global .tela {
+    display: none !important;
+}
+body.modo-palco-global .tela#tela-visualizar {
+    display: block !important;
+    background: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 30px 40px !important;
+    border-radius: 0 !important;
+    min-height: 100vh;
+}
+body.modo-palco-global .topo-visualizacao {
+    background: #09090b;
+    padding: 15px 25px !important;
+    border: 1px solid #222 !important;
+    border-radius: 12px;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+}
+body.modo-palco-global #view-corpo-cifra {
+    background: transparent !important;
+    border: none !important;
+    padding: 40px 10px !important;
+    max-height: 70vh;
+}
+body.modo-palco-global .texto-tag {
+    color: #ffffff !important;
+    font-weight: 500;
+}
+body.modo-palco-global .acorde-tag {
+    color: #ffb020 !important;
+    text-shadow: 0 0 12px rgba(255,176,32,0.4);
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+@media(max-width:768px){
+    body { padding: 20px 10px; }
+    .tela { padding: 24px 16px; border-radius: 16px; }
+    .linha-botoes { flex-direction: column; gap: 12px; }
+    .topo-visualizacao { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .painel-controles-mestre { width: 100%; justify-content: flex-start; }
+    #view-corpo-cifra { max-height: 45vh; padding: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="alternador-tema-global" onclick="alternarTemaLuz()" title="Mudar Tema">🌓</div>
+
+<div id="splash-screen" class="tela-intro">
+    <div class="intro-conteudo">
+        <h1 style="font-size: 4.5rem; margin-bottom: 20px; letter-spacing: -0.06em;">GbCifra</h1>
+        <p class="logo-subtitulo">Smart Chords System</p>
+        <button onclick="sairDaIntroducao()" style="font-size: 1rem; padding: 16px 40px; border-radius: 12px;">
+            Acessar Sistema
+        </button>
+    </div>
+</div>
+
+<div class="container">
+
+    <div id="tela-home" class="tela ativa">
+        <h1>GbCifra</h1>
+        <div class="grupo-botoes-home">
+            <div class="linha-botoes">
+                <button onclick="prepararNovoCadastro()" style="flex:1;">➕ Adicionar nova cifra</button>
+                <button class="secundario" onclick="abrirProcurarCifra()" style="flex:1;">🔍 Procurar cifra</button>
+            </div>
+            <button onclick="abrirTelaPlaylists()" class="btn-animado-hoje">
+                🎵 Gerenciar Playlists e Repertórios (<span id="txt-contador-home">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <div id="tela-cadastro" class="tela">
+        <h2 id="titulo-cadastro">Cadastrar Música</h2>
+        <input type="hidden" id="cad-id-edicao" value="">
+
+        <div class="campo-grupo">
+            <label>Nome da música *</label>
+            <input type="text" id="cad-nome" placeholder="Ex: Deixa a Luz do Céu Entrar">
+        </div>
+        <div class="campo-grupo">
+            <label>Cantor / Artista</label>
+            <input type="text" id="cad-cantor" placeholder="Ex: Harpa Cristã">
+        </div>
+        <div class="campo-grupo">
+            <label>Tom base</label>
+            <select id="cad-tom">
+              <option>C</option><option>Cm</option><option>C#</option><option>C#m</option><option>D</option><option>Dm</option><option>D#</option><option>D#m</option><option>E</option><option>Em</option><option>F</option><option>Fm</option><option>F#</option><option>F#m</option><option>G</option><option>Gm</option><option>G#</option><option>G#m</option><option>A</option><option>Am</option><option>A#</option><option>A#m</option><option>B</option><option>Bm</option>  
+            </select>
+        </div>
+        <div class="campo-grupo">
+            <label>Filtros por Temas</label>
+            <div class="grid-temas-cadastro" id="cadastro-temas-checkboxes"></div>
+        </div>
+        <div class="campo-grupo">
+            <label>Letra da música * <span style="color: var(--cor-acorde); font-size:0.7rem; text-transform:none; margin-left:5px;">(O sistema detecta automaticamente cifras integradas ou linha sobre linha)</span></label>
+            <textarea id="cad-letra" placeholder="Cole a letra pura ou com as cifras aqui...&#10;Aceita formato [C]Letra ou bloco tradicional de cifras acima da letra."></textarea>
+        </div>
+        <div style="display:flex; gap:12px; justify-content: flex-end; margin-top: 30px;">
+            <button class="secundario" onclick="cancelarCadastro()">Cancelar</button>
+            <button onclick="avancarParaEditor()">Avançar para Editor →</button>
+        </div>
+    </div>
+
+    <div id="tela-editor" class="tela">
+        <h2>Montagem de Grade de Acordes</h2>
+        <p style="color: var(--texto-escuro); margin-bottom: 24px; font-size: 0.9rem;">
+            💡 <strong>Smart Editor:</strong> Selecione uma palavra para abrir o painel OU <strong>arraste um acorde</strong> diretamente da barra inferior e solte-o na palavra desejada!
+        </p>
+        <div id="editor-fluxo-palavras" style="background: rgba(0,0,0,0.2); padding: 25px; border-radius: 14px; border: 1px solid var(--borda);"></div>
+        <div id="seletor-flutuante" class="seletor-acordes"></div>
+        <div style="display:flex; gap:12px; margin-top:30px; justify-content: flex-end;">
+            <button class="secundario" onclick="navegarPara('tela-cadastro')">Voltar ao Formulário</button>
+            <button onclick="finalizarESalvar()">💾 Confirmar e Salvar Cifra</button>
+        </div>
+    </div>
+
+    <div id="tela-busca" class="tela">
+        <h2>Banco de Cifras</h2>
+        <div class="campo-grupo">
+            <input type="text" id="busca-input" placeholder="Pesquisa inteligente (título, artista, tema ou trecho da letra)..." oninput="filtrarPorTexto()">
+        </div>
+        <div>
+            <label style="margin-bottom:12px;">Pastas Temáticas</label>
+            <div class="grid-pastas" id="container-pastas-temas"></div>
+        </div>
+        <div id="bloco-lista-musicas" style="margin-top: 15px; display: none;">
+            <label style="margin-bottom:12px;">Todas as Músicas Encontradas</label>
+            <div id="lista-cifras-renderizada"></div>    
+        </div>
+        <button class="secundario" onclick="navegarPara('tela-home')" style="margin-top: 20px;">← Menu Principal</button>
+    </div>
+    
+    <div id="tela-tema" class="tela">
+        <h2 id="titulo-tema">📁 Tema</h2>
+        <div id="lista-musicas-tema"></div>
+        <button class="secundario" onclick="navegarPara('tela-busca')" style="margin-top:20px;">← Voltar</button>
+    </div>
+
+    <div id="tela-playlists" class="tela">
+        <h2>Seus Repertórios & Playlists</h2>
+        <div class="campo-grupo" style="display:flex; gap:10px;">
+            <input type="text" id="nova-playlist-nome" placeholder="Nome do novo repertório (ex: Culto de Domingo, Ensaio...)">
+            <button onclick="criarNovaPlaylist()">＋ Criar</button>
+        </div>
+        <label style="margin-bottom:12px;">Suas Playlists Gravadas</label>
+        <div id="lista-playlists-renderizada" style="margin-bottom:20px;"></div>
+        <button class="secundario" onclick="navegarPara('tela-home')">← Menu Principal</button>
+    </div>
+
+    <div id="tela-playlist-detalhe" class="tela">
+        <h2 id="titulo-playlist-ativa">📋 Playlist</h2>
+        <p style="color: var(--texto-escuro); font-size:0.85rem; margin-bottom:20px;">⚡ Arraste as linhas usando o ícone lateral para organizar a ordem das músicas.</p>
+        <div id="corpo-playlist-itens"></div>
+        <button class="secundario" onclick="navegarPara('tela-playlists')" style="margin-top: 20px;">← Voltar para Playlists</button>
+    </div>
+
+    <div id="tela-visualizar" class="tela">
+        <div class="topo-visualizacao">
+            <div>
+                <h2 id="view-nome" style="border:none; padding:0; margin-bottom:4px;">Nome da Música</h2>
+                <p id="view-detalhes" style="color: var(--texto-escuro); font-size: 0.9rem;"></p>
+            </div>
+            
+            <div class="painel-controles-mestre">
+                <div class="controles-visibilidade">
+                    <button id="btn-toggle-cifras" onclick="alternarExibicaoCifras()">👁️ Ocultar Cifras</button>
+                </div>
+
+                <div class="controles-zoom">
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro);">ZOOM</span>
+                    <button onclick="ajustarZoom(-0.1)">A-</button>
+                    <button onclick="ajustarZoom(0.1)">A+</button>
+                </div>
+
+                <div class="controles-capo">
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro); margin-right:2px;">CAPO</span>
+                    <select id="seletor-capo" onchange="alterarCapo(this.value)">
+                        <option value="0">Sem Capo</option>
+                        <option value="1">1ª Casa</option>
+                        <option value="2">2ª Casa</option>
+                        <option value="3">3ª Casa</option>
+                        <option value="4">4ª Casa</option>
+                        <option value="5">5ª Casa</option>
+                        <option value="6">6ª Casa</option>
+                        <option value="7">7ª Casa</option>
+                    </select>
+                </div>
+
+                <div class="controles-rolagem">
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro);">SCROLL</span>
+                    <button id="btn-play-scroll" onclick="alternarAutoScroll()">▶ Play</button>
+                    <button onclick="mudarVelocidadeScroll(-1)">-</button>
+                    <span id="txt-velocidade-scroll" style="font-size:0.8rem; font-weight:600; min-width:24px; text-align:center;">1x</span>
+                    <button onclick="mudarVelocidadeScroll(1)">+</button>
+                </div>
+
+                <div class="controles-tom">
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro);">TOM</span>
+                    <button onclick="ajustarTom(-1)">-</button>
+                    <span id="txt-tom-relativo" style="font-size:0.8rem; font-weight:600; min-width:40px; text-align:center;">Tom: 0</span>
+                    <button onclick="ajustarTom(1)">+</button>
+                </div>
+                
+                <button id="btn-salvar-novo-tom" class="sucesso" style="display:none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem;" onclick="salvarTomAtualComoDefinitivo()">
+                    💾 Fixar Tom
+                </button>
+            </div>
+        </div>
+        
+        <div id="view-corpo-cifra"></div>
+        
+        <div style="margin-top: 30px; display:flex; gap:12px; justify-content: space-between; flex-wrap: wrap;">
+            <button class="secundario" onclick="voltarDoVisualizador()">← Voltar</button>
+            <div style="display:flex; gap:12px; flex-wrap: wrap;">
+                <button class="whatsapp" onclick="compartilharPorWhatsApp()">🟢 Compartilhar WhatsApp</button>
+                <button class="secundario" id="btn-fullscreen-toggle" onclick="alternarTelaCheia()" style="border-color: #3b82f6; color: #3b82f6;">🖵 Tela Cheia</button>
+                <button class="secundario" id="btn-modo-palco-toggle" onclick="alternarModoPalcoCompleto()" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">🎦 Modo Palco</button>
+                <button class="info" id="btn-editar-visualizador">✏ Editar</button>
+                <button class="perigo" id="btn-excluir-visualizador">🗑 Excluir</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const listaTemasFixos = ['Entrada', 'Perdão', 'Glória', 'Ofertório','Santo','Cordeiro','Comunhão','Louvor', 'Adoração','Batismo','Espirito Santo'];
+const escalaCromatica = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+const acordes = {
+    maiores: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+    menores: ['Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'],
+    setima:  ['C7', 'C#7', 'D7', 'D#7', 'E7', 'F7', 'F#7', 'G7', 'G#7', 'A7', 'A#7', 'B7']
+};
+const acordesRapidos = [...acordes.maiores, ...acordes.menores, ...acordes.setima];
+
+let bancoMusicas = [];
+try {
+    const dadosSalvos = localStorage.getItem('banco_cifras_v3');
+    if (dadosSalvos) {
+        bancoMusicas = JSON.parse(dadosSalvos) || [];
+        if (!Array.isArray(bancoMusicas)) bancoMusicas = [];
+    }
+} catch(e) {
+    console.error("Erro ao carregar banco de musicas:", e);
+    bancoMusicas = [];
+}
+
+let playlistsCofre = [{id: 'repertorio-padrao', nome: 'Repertório Principal Hoje', musicas: []}];
+try {
+    const salvas = localStorage.getItem('playlists_v4');
+    if (salvas) {
+        playlistsCofre = JSON.parse(salvas) || playlistsCofre;
+        if (!Array.isArray(playlistsCofre)) {
+            playlistsCofre = [{id: 'repertorio-padrao', nome: 'Repertório Principal Hoje', musicas: []}];
+        }
+    }
+} catch(e) {
+    console.error("Erro ao carregar playlists:", e);
+}
+
+let playlistAtivaId = 'repertorio-padrao';
+let musicaEmConstrucao = null;
+let musicaAtivaVisualizacao = null;
+let deslocamentoTomAtual = 0;
+let capoAtual = 0;
+let telaOrigemVisualizador = 'tela-home';
+let temaAtivoAnterior = ''; 
+let alvoPalavra = { linha: null, palavra: null };
+
+let intervaloScroll = null;
+let executandoScroll = false;
+let velocidadScrollAtual = 1; 
+
+let touchStartX = 0;
+let touchEndX = 0;
+let itemArrastadoIdx = null;
+
+let exibirCifrasNoPainel = true;
+let modoPalcoAtivo = false;
+
+function sairDaIntroducao() {
+    const splash = document.getElementById('splash-screen');
+    splash.style.opacity = '0';
+    splash.style.transform = 'scale(1.02)';
+    setTimeout(() => { splash.style.display = 'none'; }, 500);
+}
+
+function navegarPara(idTela){
+    pararAutoScroll(); 
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.getElementById(idTela).classList.add('ativa');
+    window.scrollTo({ top: 0 });
+}
+
+function atualizarContadoresInterface(){
+    const elem = document.getElementById('txt-contador-home');
+    if(elem) elem.innerText = playlistsCofre.length + " Pasta(s)";
+}
+
+function renderizarCheckboxesCadastro(){
+    const container = document.getElementById('cadastro-temas-checkboxes');
+    if(!container) return;
+    container.innerHTML = '';
+    listaTemasFixos.forEach(tema=>{
+        const label = document.createElement('label');
+        label.className = 'opcao-checkbox';
+        label.innerHTML = `<input type="checkbox" name="temas-cad" value="${tema}"> ${tema}`;
+        container.appendChild(label);
+    });
+}
+
+function prepararNovoCadastro() {
+    document.getElementById('titulo-cadastro').innerText = "Cadastrar Música";
+    document.getElementById('cad-id-edicao').value = "";
+    document.getElementById('cad-nome').value = "";
+    document.getElementById('cad-cantor').value = "";
+    document.getElementById('cad-letra').value = "";
+    document.querySelectorAll('input[name="temas-cad"]').forEach(cb => cb.checked = false);
+    musicaEmConstrucao = null;
+    navegarPara('tela-cadastro');
+}
+
+function cancelarCadastro() {
+    prepararNovoCadastro();
+    navegarPara('tela-home');
+}
+
+if(localStorage.getItem('tema_preferido') === 'claro') {
+    document.body.classList.add('modo-claro');
+}
+function alternarTemaLuz() {
+    document.body.classList.toggle('modo-claro');
+    if(document.body.classList.contains('modo-claro')) {
+        localStorage.setItem('tema_preferido', 'claro');
+    } else {
+        localStorage.setItem('tema_preferido', 'escuro');
+    }
+}
+
+function alternarExibicaoCifras() {
+    exibirCifrasNoPainel = !exibirCifrasNoPainel;
+    const container = document.getElementById('view-corpo-cifra');
+    const btn = document.getElementById('btn-toggle-cifras');
+    
+    if(exibirCifrasNoPainel) {
+        container.classList.remove('ocultar-todas-cifras');
+        btn.innerText = "👁️ Ocultar Cifras";
+    } else {
+        container.classList.add('ocultar-todas-cifras');
+        btn.innerText = "👁️‍🗨️ Mostrar Cifras";
+    }
+}
+
+function alternarTelaCheia() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen()
+            .catch(err => console.log(`Erro ao ativar tela cheia: ${err.message}`));
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+function atualizarBotaoFullscreen() {
+    const btn = document.getElementById('btn-fullscreen-toggle');
+    if (btn) {
+        if (document.fullscreenElement) {
+            btn.innerText = "🖵 Sair da Tela Cheia";
+            btn.style.background = "rgba(59, 130, 246, 0.2)";
+        } else {
+            btn.innerText = "🖵 Tela Cheia";
+            btn.style.background = "rgba(255, 255, 255, 0.04)";
+        }
+    }
+}
+
+document.addEventListener('fullscreenchange', atualizarBotaoFullscreen);
+
+function alternarModoPalcoCompleto() {
+    modoPalcoAtivo = !modoPalcoAtivo;
+    const btn = document.getElementById('btn-modo-palco-toggle');
+    
+    if(modoPalcoAtivo) {
+        document.body.classList.add('modo-palco-global');
+        btn.innerText = "❌ Sair do Palco";
+    } else {
+        document.body.classList.remove('modo-palco-global');
+        btn.innerText = "🎦 Modo Palco";
+    }
+}
+
+function processarTextoECifrasAutomatico(textoBruto) {
+    const lines = textoBruto.split('\n');
+    let estruturaFinal = [];
+
+    function ehUmAcorde(token) {
+        const limpo = token.trim().replace(/[()]/g, '');
+        if (!limpo) return false;
+        const padraoAcorde = /^[A-G][b#]?(m|M|maj|min|dim|aug|sus|add|7|9|11|13|cos)*(\/[A-G][b#]?)?$/;
+        return padraoAcorde.test(limpo);
+    }
+
+    function ehLinhaDeAcordes(linha) {
+        const tokens = inline = linha.trim().split(/\s+/);
+        if(tokens.length === 0 || linha.trim() === '') return false;
+        return tokens.every(t => ehUmAcorde(t));
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+        let linhaAtual = lines[i];
+
+        if (linhaAtual.includes('[') && linhaAtual.includes(']')) {
+            let palavrasConstruidas = [];
+            let partes = linhaAtual.split(/(\[[^\]]+\])/);
+            let acordePendente = '';
+
+            partes.forEach(parte => {
+                if (parte.startsWith('[') && parte.endsWith(']')) {
+                    acordePendente = parte.slice(1, -1);
+                } else if (parte.trim() !== '' || parte === ' ') {
+                    let fragmentos = parte.split(' ');
+                    fragmentos.forEach((frag, fIdx) => {
+                        if (frag === '' && fIdx > 0) return;
+                        palavrasConstruidas.push({
+                            texto: frag || ' ',
+                            acorde: fIdx === 0 ? acordePendente : ''
+                        });
+                        if (fIdx === 0) acordePendente = ''; 
+                    });
+                }
+            });
+            if (palavrasConstruidas.length > 0) estruturaFinal.push(palavrasConstruidas);
+            continue;
+        }
+
+        if (ehLinhaDeAcordes(linhaAtual) && i + 1 < lines.length && !ehLinhaDeAcordes(lines[i + 1])) {
+            let linhaCifras = linhaAtual;
+            let linhaTexto = lines[i + 1];
+            i++; 
+
+            let mapaCifrasMarcadas = [];
+            let regexPegarEstrategica = /(\S+)/g;
+            let match;
+            while ((match = regexPegarEstrategica.exec(linhaCifras)) !== null) {
+                mapaCifrasMarcadas.push({ acorde: match[1], colunaPos: match.index });
+            }
+
+            let tokensPalavras = linhaTexto.split(' ').filter(Boolean);
+            let conjuntoPalavrasLinha = [];
+            let trackerIndexLeitura = 0;
+
+            tokensPalavras.forEach((palavra) => {
+                let largadaPalavra = AppObterIndexAjustado(linhaTexto, palavra, trackerIndexLeitura);
+                trackerIndexLeitura = largadaPalavra + palavra.length;
+
+                let acordeAlocado = '';
+                if (mapaCifrasMarcadas.length > 0) {
+                    let cIdx = mapaCifrasMarcadas.findIndex(d => d.colunaPos <= largadaPalavra + palavra.length + 2);
+                    if (cIdx !== -1) {
+                        acordeAlocado = mapaCifrasMarcadas[cIdx].acorde;
+                        mapaCifrasMarcadas.splice(cIdx, 1);
+                    }
+                }
+                conjuntoPalavrasLinha.push({ texto: palavra, acorde: acordeAlocado });
+            });
+
+            while (mapaCifrasMarcadas.length > 0) {
+                conjuntoPalavrasLinha.push({ texto: ' ', acorde: mapaCifrasMarcadas.shift().acorde });
+            }
+
+            if (conjuntoPalavrasLinha.length > 0) estruturaFinal.push(conjuntoPalavrasLinha);
+        } else {
+            if (linhaAtual.trim() !== '') {
+                let blocoSimples = linhaAtual.split(' ').filter(Boolean).map(p => ({ texto: p, acorde: '' }));
+                if (blocoSimples.length > 0) estruturaFinal.push(blocoSimples);
+            }
+        }
+    }
+    return estruturaFinal;
+}
+
+function AppObterIndexAjustado(texto, palavra, start) {
+    let pos = texto.indexOf(palavra, start);
+    return pos === -1 ? start : pos;
+}
+
+function avancarParaEditor(){
+    const idEdicao = document.getElementById('cad-id-edicao').value;
+    const nome = document.getElementById('cad-nome').value.trim();
+    const cantor = document.getElementById('cad-cantor').value.trim();
+    const tomBase = document.getElementById('cad-tom').value;
+    const letraBruta = document.getElementById('cad-letra').value;
+    const temasSelecionados = [...document.querySelectorAll('input[name="temas-cad"]:checked')].map(cb=>cb.value);
+
+    if(!nome || !letraBruta.trim()){
+        alert('Por favor, adicione o Título e insira a Letra/Cifra.');
+        return;
+    }
+
+    const linhasTratadas = processarTextoECifrasAutomatico(letraBruta);
+
+    musicaEmConstrucao = {
+        id: idEdicao ? Number(idEdicao) : Date.now(),
+        nome,
+        cantor,
+        tomBase,
+        temas: temasSelecionados,
+        estrutura: linhasTratadas
+    };
+
+    renderizarPainelEditorGrade();
+    navegarPara('tela-editor');
+}
+
+function renderizarPainelEditorGrade() {
+    const container = document.getElementById('editor-fluxo-palavras');
+    container.innerHTML = '';
+
+    musicaEmConstrucao.estrutura.forEach((linha, lIdx)=>{
+        const divLinha = document.createElement('div');
+        divLinha.className = 'linha-musica';
+
+        linha.forEach((palavra, pIdx)=>{
+            const box = document.createElement('div');
+            box.className = 'palavra-box';
+            
+            box.onclick = (e)=>{
+                e.stopPropagation();
+                alvoPalavra = { linha: lIdx, palavra: pIdx }; 
+                const seletor = document.getElementById('seletor-flutuante');
+                seletor.style.display = 'grid';
+            };
+
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('drag-over');
+            });
+
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('drag-over');
+            });
+
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('drag-over');
+                const ac = e.dataTransfer.getData('text/plain');
+                if (ac) {
+                    musicaEmConstrucao.estrutura[lIdx][pIdx].acorde = ac;
+                    document.getElementById(`ed-ac-${lIdx}-${pIdx}`).innerText = ac;
+                }
+            });
+
+            box.innerHTML = `
+                <span class="acorde-tag" id="ed-ac-${lIdx}-${pIdx}">${palavra.acorde || '&nbsp;'}</span>
+                <span class="texto-tag">${palavra.texto}</span>
+            `;
+            divLinha.appendChild(box);
+        });
+        container.appendChild(divLinha);
+    });
+
+    const menuf = document.getElementById('seletor-flutuante');
+    menuf.innerHTML = '';
+
+    acordesRapidos.forEach(ac=>{
+        const b = document.createElement('button');
+        b.innerText = ac;
+        b.setAttribute('draggable', 'true'); 
+        
+        b.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', ac);
+        });
+
+        b.onclick = (e)=>{
+            e.stopPropagation();
+            aplicarAcordeEditor(ac);
+        };
+        menuf.appendChild(b);
+    });
+
+    const btnRemover = document.createElement('button');
+    btnRemover.innerText = 'Apagar Acorde';
+    btnRemover.className = 'btn-remover';
+    btnRemover.onclick = (e)=>{
+        e.stopPropagation();
+        const {linha, palavra} = alvoPalavra;
+        if(linha !== null && palavra !== null) {
+            musicaEmConstrucao.estrutura[linha][palavra].acorde = '';
+            document.getElementById(`ed-ac-${linha}-${palavra}`).innerHTML = '&nbsp;';
+        }
+        document.getElementById('seletor-flutuante').style.display = 'none';
+    };
+    menuf.appendChild(btnRemover);
+    menuf.style.display = 'grid';
+}
+
+function aplicarAcordeEditor(valorAcorde) {
+    const {linha, palavra} = alvoPalavra;
+    if(linha === null || palavra === null) return;
+
+    musicaEmConstrucao.estrutura[linha][palavra].acorde = valorAcorde;
+    document.getElementById(`ed-ac-${linha}-${palavra}`).innerHTML = valorAcorde;
+    document.getElementById('seletor-flutuante').style.display = 'none';
+}
+
+function finalizarESalvar(){
+    const indexExistente = bancoMusicas.findIndex(m => m.id === musicaEmConstrucao.id);
+    if(indexExistente > -1) {
+        bancoMusicas[indexExistente] = musicaEmConstrucao;
+    } else {
+        bancoMusicas.push(musicaEmConstrucao);
+    }
+    localStorage.setItem('banco_cifras_v3', JSON.stringify(bancoMusicas));
+    alert('Partitura interativa sincronizada no banco!');
+    prepararNovoCadastro();
+    abrirProcurarCifra();
+}
+
+function iniciarEdicaoCifra(id) {
+    const musica = bancoMusicas.find(m => m.id === id);
+    if(!musica) return;
+
+    document.getElementById('titulo-cadastro').innerText = "Editar Música";
+    document.getElementById('cad-id-edicao').value = musica.id;
+    document.getElementById('cad-nome').value = musica.nome;
+    document.getElementById('cad-cantor').value = musica.cantor || '';
+    document.getElementById('cad-tom').value = musica.tomBase || 'C';
+    
+    document.querySelectorAll('input[name="temas-cad"]').forEach(cb => {
+        cb.checked = musica.temas && musica.temas.includes(cb.value);
+    });
+
+    let letraRecomposta = musica.estrutura.map(linha => {
+        return linha.map(p => p.acorde ? `[${p.acorde}]${p.texto}` : p.texto).join(' ');
+    }).join('\n');
+
+    document.getElementById('cad-letra').value = letraRecomposta;
+    musicaEmConstrucao = JSON.parse(JSON.stringify(musica));
+    navegarPara('tela-cadastro');
+}
+
+function excluirCifraDoBanco(id) {
+    if(confirm("Deseja apagar permanentemente esta cifra do banco global?")) {
+        bancoMusicas = bancoMusicas.filter(m => m.id !== id);
+        playlistsCofre.forEach(p => p.musicas = p.musicas.filter(mid => mid !== id));
+        
+        localStorage.setItem('banco_cifras_v3', JSON.stringify(bancoMusicas));
+        localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+        
+        atualizarContadoresInterface();
+        if (document.getElementById('tela-tema').classList.contains('ativa') && temaAtivoAnterior) {
+            abrirTema(temaAtivoAnterior);
+        } else {
+            abrirProcurarCifra();
+        }
+    }
+}
+
+function abrirTelaPlaylists() {
+    renderizarListaPlaylists();
+    navegarPara('tela-playlists');
+}
+
+function criarNovaPlaylist() {
+    const input = document.getElementById('nova-playlist-nome');
+    const nome = input.value.trim();
+    if(!nome) return;
+
+    const nova = { id: 'play-' + Date.now(), nome: nome, musicas: [] };
+    playlistsCofre.push(nova);
+    localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+    input.value = '';
+    renderizarListaPlaylists();
+    atualizarContadoresInterface();
+}
+
+function deletarPlaylist(id, event) {
+    event.stopPropagation();
+    if(id === 'repertorio-padrao') return alert('A playlist padrão não pode ser removida.');
+    if(confirm("Remover esta lista de reprodução completamente?")) {
+        playlistsCofre = playlistsCofre.filter(p => p.id !== id);
+        if(playlistAtivaId === id) playlistAtivaId = 'repertorio-padrao';
+        localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+        renderizarListaPlaylists();
+        atualizarContadoresInterface();
+    }
+}
+
+function renderizarListaPlaylists() {
+    const container = document.getElementById('lista-playlists-renderizada');
+    if(!container) return;
+    container.innerHTML = '';
+
+    playlistsCofre.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'item-busca';
+        div.onclick = () => verDetalhesPlaylist(p.id);
+        div.innerHTML = `
+            <div>
+                <strong style="color: #fff; font-size:1rem;">📁 ${p.nome}</strong><br>
+                <span style="color: var(--texto-escuro); font-size:0.8rem;">${p.musicas.length} Músicas acopladas</span>
+            </div>
+            <div class="item-acoes">
+                <button class="perigo" onclick="deletarPlaylist('${p.id}', event)">🗑️</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function verDetalhesPlaylist(id) {
+    playlistAtivaId = id;
+    const play = playlistsCofre.find(p => p.id === id);
+    if(!play) return;
+    document.getElementById('titulo-playlist-ativa').innerText = `📋 Repertório: ${play.nome}`;
+    renderizarItensPlaylistOrdenaveis();
+    navegarPara('tela-playlist-detalhe');
+}
+
+function renderizarItensPlaylistOrdenaveis() {
+    const container = document.getElementById('corpo-playlist-itens');
+    if(!container) return;
+    container.innerHTML = '';
+    const play = playlistsCofre.find(p => p.id === playlistAtivaId);
+
+    if(!play || play.musicas.length === 0) {
+        container.innerHTML = `<p style="color:var(--texto-escuro); padding:30px; text-align:center; font-size:0.9rem;">Nenhuma cifra vinculada. Vá em procurar cifras e adicione a este repertório.</p>`;
+        return;
+    }
+
+    play.musicas.forEach((mId, index) => {
+        const m = bancoMusicas.find(mus => mus.id === mId);
+        if(!m) return;
+
+        const div = document.createElement('div');
+        div.className = 'item-busca';
+        div.setAttribute('draggable', 'true');
+        div.dataset.index = index;
+
+        div.addEventListener('dragstart', () => {
+            itemArrastadoIdx = index;
+            div.classList.add('arrastando');
+        });
+
+        div.addEventListener('dragover', (e) => { e.preventDefault(); });
+
+        div.addEventListener('drop', () => {
+            const indexAlvo = Number(div.dataset.index);
+            div.classList.remove('arrastando');
+            if(itemArrastadoIdx !== null && itemArrastadoIdx !== indexAlvo) {
+                const itemMovido = play.musicas.splice(itemArrastadoIdx, 1)[0];
+                play.musicas.splice(indexAlvo, 0, itemMovido);
+                localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+                renderizarItensPlaylistOrdenaveis();
+            }
+        });
+
+        div.addEventListener('dragend', () => { div.classList.remove('arrastando'); });
+
+        div.onclick = () => abrirVisualizador(m.id, 'tela-playlist-detalhe');
+        div.innerHTML = `
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <span style="color: var(--texto-muto); font-weight:bold; cursor:move; font-size:1.1rem;">☰</span>
+                <div>
+                    <strong style="color:#fff; font-size:0.95rem;">${index + 1}. ${m.nome}</strong><br>
+                    <span style="color:var(--texto-escuro); font-size:0.8rem;">${m.cantor || 'Artista'} • Tom: ${m.tomBase}</span>
+                </div>
+            </div>
+            <div class="item-acoes">
+                <button class="perigo" style="padding: 6px 12px; font-size:0.75rem;" onclick="event.stopPropagation(); removerMusicaDaPlaylistEstrategico(${index})">Remover</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removerMusicaDaPlaylistEstrategico(index) {
+    const play = playlistsCofre.find(p => p.id === playlistAtivaId);
+    if(!play) return;
+    play.musicas.splice(index, 1);
+    localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+    renderizarItensPlaylistOrdenaveis();
+    atualizarContadoresInterface();
+}
+
+function abrirProcurarCifra(){
+    exibirModoPastas();
+    document.getElementById('lista-cifras-renderizada').innerHTML = '';
+    document.getElementById('busca-input').value = '';
+    document.getElementById('bloco-lista-musicas').style.display = 'none';
+    navegarPara('tela-busca');
+}
+
+function exibirModoPastas(){
+    const container = document.getElementById('container-pastas-temas');
+    if(!container) return;
+    container.innerHTML = '';
+    listaTemasFixos.forEach(tema=>{
+        const musicas = bancoMusicas.filter(m=>m.temas && m.temas.includes(tema));
+        const card = document.createElement('div');
+        card.className = 'pasta-card';
+        card.onclick = () => abrirTema(tema);
+        card.innerHTML = `<h3>${tema}</h3><p>${musicas.length} ${musicas.length === 1 ? 'música' : 'músicas'}</p>`;
+        container.appendChild(card);
+    });
+}
+
+function abrirTema(nomeTema){
+    temaAtivoAnterior = nomeTema;
+    const musicas = bancoMusicas.filter(m => m.temas && m.temas.includes(nomeTema));
+    document.getElementById('titulo-tema').innerText = `📁 Tema: ${nomeTema}`;
+    renderizarMusicasTema(musicas);
+    navegarPara('tela-tema');
+}
+
+function filtrarPorTexto(){
+    const termo = document.getElementById('busca-input').value.toLowerCase().trim();
+    const bloco = document.getElementById('bloco-lista-musicas');
+
+    if(termo === ''){
+        bloco.style.display = 'none';
+        return;
+    }
+
+    bloco.style.display = 'block';
+    const termosFracionados = termo.split(/\s+/);
+
+    const filtradas = bancoMusicas.filter(m => {
+        let stringLetraInterna = "";
+        if (m.estrutura) {
+            stringLetraInterna = m.estrutura.map(l => l.map(p => p.texto).join(' ')).join(' ').toLowerCase();
+        }
+
+        const nome = m.nome.toLowerCase();
+        const cantor = (m.cantor || '').toLowerCase();
+        const temas = (m.temas || []).join(' ').toLowerCase();
+
+        return termosFracionados.every(token => {
+            return nome.includes(token) || 
+                   cantor.includes(token) || 
+                   temas.includes(token) || 
+                   stringLetraInterna.includes(token);
+        });
+    });
+    renderizarLinhasDeMusica(filtradas);
+}
+
+function renderizarMusicasTema(lista){
+    const container = document.getElementById('lista-musicas-tema');
+    if(!container) return;
+    container.innerHTML = '';
+
+    if(lista.length === 0){
+        container.innerHTML = '<p style="color: var(--texto-escuro); padding: 10px; font-size:0.9rem;">Nenhuma música vinculada a este tema.</p>';
+        return;
+    }
+
+    lista.forEach(m=>{
+        const div = document.createElement('div');
+        div.className = 'item-busca';
+        div.onclick = () => abrirVisualizador(m.id, 'tela-tema');
+        div.innerHTML = `
+            <div>
+                <strong style="font-size:0.95rem;">${m.nome}</strong><br>
+                <span style="color:var(--texto-escuro); font-size:0.8rem;">${m.cantor || 'Intérprete Não Informado'}</span>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function renderizarLinhasDeMusica(lista){
+    const container = document.getElementById('lista-cifras-renderizada');
+    if(!container) return;
+    container.innerHTML = '';
+
+    if(lista.length === 0) {
+        container.innerHTML = '<p style="color: var(--texto-escuro); text-align: center; padding: 20px; font-size:0.9rem;">Nenhum registro localizado no banco.</p>';
+        return;
+    }
+
+    let playlistOptions = '';
+    playlistsCofre.forEach(function(p) {
+        playlistOptions += '<option value="' + p.id + '">' + p.nome + '</option>';
+    });
+
+    lista.forEach(m=>{
+        const div = document.createElement('div');
+        div.className = 'item-busca';
+        div.onclick = () => abrirVisualizador(m.id, 'tela-busca');
+
+        div.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:15px;">
+            <div style="flex:1; min-width:0;">
+                <div style="font-size:0.95rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.nome}</div>
+                <div style="font-size:0.8rem; color:var(--texto-escuro);">${m.cantor || 'Intérprete'}</div>
+            </div>
+            <div class="item-acoes">
+                <button class="info" onclick="event.stopPropagation(); iniciarEdicaoCifra(${m.id})">✏️</button>
+                <button class="perigo" onclick="event.stopPropagation(); excluirCifraDoBanco(${m.id})">🗑️</button>
+                <select style="width:120px; padding:6px 10px; font-size:0.75rem;" onclick="event.stopPropagation();" onchange="vincularMusicaNaPlaylistAbaBusca(${m.id}, this)">
+                     <option value="">+ Playlist...</option>
+                     ${playlistOptions}
+                </select>
+            </div>
+        </div>`;
+        container.appendChild(div);
+    });
+}
+
+function vincularMusicaNaPlaylistAbaBusca(musicaId, seletorElemento) {
+    const playId = seletorElemento.value;
+    if(!playId) return;
+
+    const playlistAlvo = playlistsCofre.find(p => p.id === playId);
+    if(!playlistAlvo) return;
+    if(playlistAlvo.musicas.includes(musicaId)) {
+        alert(`Esta música já faz parte da playlist: ${playlistAlvo.nome}`);
+    } else {
+        playlistAlvo.musicas.push(musicaId);
+        localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+        alert(`Adicionada com sucesso em ${playlistAlvo.nome}!`);
+        atualizarContadoresInterface();
+    }
+    seletorElemento.value = "";
+}
+
+function transporAcorde(acorde, semitons){
+    if(!acorde) return '';
+    return acorde.split(' ').map(ac => {
+        const partes = ac.split('/');
+        return partes.map(parte => {
+            const match = parte.match(/^([A-G]#?|b?)(.*)/);
+            if(!match) return parte;
+
+            let notaBase = match[1];
+            const sufixo = match[2];
+            
+            if(notaBase === 'Bb') notaBase = 'A#';
+            if(notaBase === 'Db') notaBase = 'C#';
+            if(notaBase === 'Eb') notaBase = 'D#';
+            if(notaBase === 'Gb') notaBase = 'F#';
+            if(notaBase === 'Ab') notaBase = 'G#';
+
+            const indice = escalaCromatica.indexOf(notaBase);
+            if(indice === -1) return parte;
+
+            let novoIndice = (indice + semitons) % 12;
+            if(novoIndice < 0) novoIndice += 12;
+
+            return escalaCromatica[novoIndice] + sufixo;
+        }).join('/');
+    }).join(' ');
+}
+
+function abrirVisualizador(id, origem){
+    musicaAtivaVisualizacao = bancoMusicas.find(m=>m.id === id);
+    if(!musicaAtivaVisualizacao) return;
+    
+    deslocamentoTomAtual = 0;
+    capoAtual = 0;
+    exibirCifrasNoPainel = true; 
+    document.getElementById('seletor-capo').value = "0";
+    document.getElementById('btn-toggle-cifras').innerText = "👁️ Ocultar Cifras";
+    document.getElementById('view-corpo-cifra').classList.remove('ocultar-todas-cifras');
+    
+    telaOrigemVisualizador = origem || 'tela-home';
+    
+    document.getElementById('btn-editar-visualizador').onclick = () => { pararAutoScroll(); desativarModoPalcoForçado(); iniciarEdicaoCifra(musicaAtivaVisualizacao.id); };
+    document.getElementById('btn-excluir-visualizador').onclick = () => { desativarModoPalcoForçado(); excluirCifraDoBanco(musicaAtivaVisualizacao.id); };
+
+    resetMecanismoScroll();
+    renderizarCifraPronta();
+    atualizarBotaoFullscreen();
+    navegarPara('tela-visualizar');
+}
+
+function desativarModoPalcoForçado() {
+    modoPalcoAtivo = false;
+    document.body.classList.remove('modo-palco-global');
+    document.getElementById('btn-modo-palco-toggle').innerText = "🎦 Modo Palco";
+    if (document.fullscreenElement && document.exitFullscreen) { 
+        document.exitFullscreen().catch(() => {}); 
+    }
+}
+
+function voltarDoVisualizador(){
+    desativarModoPalcoForçado();
+    if (telaOrigemVisualizador === 'tela-tema' && temaAtivoAnterior) {
+        abrirTema(temaAtivoAnterior);
+    } else {
+        if(telaOrigemVisualizador === 'tela-playlist-detalhe') verDetalhesPlaylist(playlistAtivaId);
+        else navegarPara(telaOrigemVisualizador);
+    }
+}
+
+function ajustarTom(direcao){
+    deslocamentoTomAtual += direcao;
+    renderizarCifraPronta();
+}
+
+function alterarCapo(casaFret) {
+    capoAtual = Number(casaFret);
+    renderizarCifraPronta();
+}
+
+function ajustarZoom(fator) {
+    const root = document.documentElement;
+    let computedEstilo = window.getComputedStyle(root).getPropertyValue('--zoom-fonte-base');
+    let atualVal = parseFloat(computedEstilo) || 1.15;
+    let novoValCalculado = atualVal + fator;
+    if(novoValCalculado < 0.7) novoValCalculado = 0.7;
+    if(novoValCalculado > 2.2) novoValCalculado = 2.2;
+    root.style.setProperty('--zoom-fonte-base', novoValCalculado + 'rem');
+}
+
+function salvarTomAtualComoDefinitivo() {
+    if (deslocamentoTomAtual === 0 || !musicaAtivaVisualizacao) return;
+    if (confirm(`Deseja salvar esta partitura alterada permanentemente para o tom atual?`)) {
+        const index = bancoMusicas.findIndex(m => m.id === musicaAtivaVisualizacao.id);
+        if (index === -1) return;
+
+        bancoMusicas[index].estrutura = bancoMusicas[index].estrutura.map(linha => {
+            return linha.map(palavra => {
+                if (palavra.acorde) palavra.acorde = transporAcorde(palavra.acorde, deslocamentoTomAtual);
+                return palavra;
+            });
+        });
+
+        bancoMusicas[index].tomBase = transporAcorde(bancoMusicas[index].tomBase, deslocamentoTomAtual);
+        localStorage.setItem('banco_cifras_v3', JSON.stringify(bancoMusicas));
+        
+        musicaAtivaVisualizacao = bancoMusicas[index];
+        deslocamentoTomAtual = 0; 
+        renderizarCifraPronta();
+        alert("Novo tom base definitivo configurado!");
+    }
+}
+
+function renderizarCifraPronta(){
+    const m = musicaAtivaVisualizacao;
+    if(!m) return;
+
+    document.getElementById('view-nome').innerText = m.nome;
+    
+    let infoApoioInstrumento = `${m.cantor || 'Artista'} • Tom Base: ${m.tomBase}`;
+    if(capoAtual > 0) {
+        let tomRealOuvido = transporAcorde(m.tomBase, deslocamentoTomAtual);
+        infoApoioInstrumento += ` | (Capo ${capoAtual}ª casa: Formato em ${transporAcorde(tomRealOuvido, -capoAtual)})`;
+    }
+    document.getElementById('view-detalhes').innerText = infoApoioInstrumento;
+    document.getElementById('txt-tom-relativo').innerText = `Tom: ${deslocamentoTomAtual >= 0 ? '+' : ''}${deslocamentoTomAtual}`;
+
+    const btnSalvarTom = document.getElementById('btn-salvar-novo-tom');
+    btnSalvarTom.style.display = (deslocamentoTomAtual !== 0) ? "inline-flex" : "none";
+
+    const container = document.getElementById('view-corpo-cifra');
+    container.innerHTML = '';
+
+    m.estrutura.forEach(linha=>{
+        const divLinha = document.createElement('div');
+        divLinha.className = 'linha-musica';
+
+        linha.forEach(palavra=>{
+            const box = document.createElement('div');
+            box.className = 'palavra-box';
+
+            let adjustment = deslocamentoTomAtual - capoAtual;
+            const acordeTranspostoCalculado = transporAcorde(palavra.acorde, adjustment);
+
+            box.innerHTML = `
+                <span class="acorde-tag">${acordeTranspostoCalculado || '&nbsp;'}</span>
+                <span class="texto-tag">${palavra.texto}</span>
+            `;
+            divLinha.appendChild(box);
+        });
+        container.appendChild(divLinha);
+    });
+}
+
+function compartilharPorWhatsApp() {
+    const m = musicaAtivaVisualizacao;
+    if(!m) return;
+
+    let adjustment = deslocamentoTomAtual - capoAtual;
+    let textoDeSaida = `*🎶 ${m.nome.toUpperCase()}* - _${m.cantor || 'Artista'}_\n`;
+    textoDeSaida += `*Tom:* ${transporAcorde(m.tomBase, deslocamentoTomAtual)}\n`;
+    if(capoAtual > 0) textoDeSaida += `*Capo:* ${capoAtual}ª Casa\n`;
+    textoDeSaida += `-------------------------------------------\n\n`;
+
+    m.estrutura.forEach(linha => {
+        let bufferLinha = "";
+        linha.forEach(palavra => {
+            if(palavra.acorde) {
+                let acordeCodificado = transporAcorde(palavra.acorde, adjustment);
+                bufferLinha += `[${acordeCodificado}]${palavra.texto} `;
+            } else {
+                bufferLinha += `${palavra.texto} `;
+            }
+        });
+        textoDeSaida += bufferLinha.trim() + "\n";
+    });
+
+    textoDeSaida += `\n_Compartilhado via GbCifra Smart System_`;
+    
+    const urlFinal = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoDeSaida)}`;
+    window.open(urlFinal, '_blank');
+}
+
+function obtenerPlaylistAtivaVetorEstrategico() {
+    const play = playlistsCofre.find(p => p.id === playlistAtivaId);
+    return play ? play.musicas : [];
+}
+
+function dispararTransicaoMusicaPlaylist(direcao) {
+    const listaIds = obtenerPlaylistAtivaVetorEstrategico();
+    if(listaIds.length <= 1 || !musicaAtivaVisualizacao) return;
+
+    let idxAtual = listaIds.indexOf(musicaAtivaVisualizacao.id);
+    if(idxAtual === -1) return;
+
+    let novoIdx = idxAtual + direcao;
+    if(novoIdx < 0) novoIdx = listaIds.length - 1; 
+    if(novoIdx >= listaIds.length) novoIdx = 0;    
+
+    abrirVisualizador(listaIds[novoIdx], telaOrigemVisualizador);
+}
+
+const painelVisualizar = document.getElementById('tela-visualizar');
+painelVisualizar.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+painelVisualizar.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    analisarMovimentoGestoEstrategico();
+}, { passive: true });
+
+function analisarMovimentoGestoEstrategico() {
+    const deltaX = touchStartX - touchEndX;
+    const sensibilidadePixels = 75; 
+
+    if(Math.abs(deltaX) > sensibilidadePixels) {
+        if(deltaX > 0) {
+            dispararTransicaoMusicaPlaylist(1);
+        } else {
+            dispararTransicaoMusicaPlaylist(-1);
+        }
+    }
+}
+
+function resetMecanismoScroll() {
+    pararAutoScroll();
+    velocidadScrollAtual = 1;
+    document.getElementById('txt-velocidade-scroll').innerText = "1x";
+}
+
+function alternarAutoScroll() {
+    const btn = document.getElementById('btn-play-scroll');
+    const container = document.getElementById('view-corpo-cifra');
+    
+    if (executandoScroll) {
+        pararAutoScroll();
+    } else {
+        executandoScroll = true;
+        btn.innerText = "⏸ Pausa";
+        btn.classList.add('btn-scroll-ativo');
+        let taxaDeAtualizacaoMs = 60 / velocidadScrollAtual;
+        intervaloScroll = setInterval(() => {
+            container.scrollBy({ top: 1, behavior: 'auto' });
+            if ((container.scrollTop + container.clientHeight) >= container.scrollHeight - 2) {
+                pararAutoScroll();
+            }
+        }, taxaDeAtualizacaoMs);
+    }
+}
+
+function pararAutoScroll() {
+    executandoScroll = false;
+    if(intervaloScroll) clearInterval(intervaloScroll);
+    const btn = document.getElementById('btn-play-scroll');
+    if(btn) {
+        btn.innerText = "▶ Play";
+        btn.classList.remove('btn-scroll-ativo');
+    }
+}
+
+function mudarVelocidadeScroll(fator) {
+    let novaVelocidade = velocidadScrollAtual + fator;
+    if (novaVelocidade < 1) novaVelocidade = 1;
+    if (novaVelocidade > 5) novaVelocidade = 5;
+    velocidadScrollAtual = novaVelocidade;
+    document.getElementById('txt-velocidade-scroll').innerText = velocidadScrollAtual + "x";
+    if (executandoScroll) {
+        pararAutoScroll();
+        alternarAutoScroll();
+    }
+}
+
+document.addEventListener('click', (e) => {
+    const seletor = document.getElementById('seletor-flutuante');
+    if(!seletor) return;
+    if(document.getElementById('tela-editor').classList.contains('active')) return;
+    
+    if(!e.target.closest('.palavra-box') && !e.target.closest('.seletor-acordes')) {
+        seletor.style.display = 'none';
+    }
+});
+
+try {
+    renderizarCheckboxesCadastro();
+    atualizarContadoresInterface();
+} catch(err) {
+    console.error("Erro na inicialização da interface gráfica:", err);
+}
+</script>
+
+</body>
+</html>
