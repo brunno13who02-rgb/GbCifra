@@ -485,6 +485,54 @@ body.modo-palco-global .acorde-tag {
     text-shadow: 0 0 12px rgba(255,176,32,0.4);
 }
 
+/* ==========================================================================
+   CONFIGURAÇÕES EXCLUSIVAS DE TELA CHEIA ISOLADA (ESTILO PERFEITO NA FOTO)
+   ========================================================================== */
+.btn-voltar-fullscreen {
+    display: none;
+}
+
+#view-corpo-cifra:fullscreen {
+    position: relative;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    background: var(--bg-principal) !important;
+    padding: 90px 40px 40px 40px !important;
+    overflow-y: auto !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+#view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
+    display: inline-flex;
+    position: fixed;
+    top: 25px;
+    left: 25px;
+    padding: 10px 22px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fafafa;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 999999;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+#view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #09090b;
+}
+body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
@@ -812,9 +860,14 @@ function alternarExibicaoCifras() {
     }
 }
 
+/* ==========================================================================
+   MODIFICADO: EXECUTA FULLSCREEN SOMENTE NO CONTEÚDO DA PARTITURA E LETRA
+   ========================================================================== */
 function alternarTelaCheia() {
+    const alvoCifra = document.getElementById('view-corpo-cifra');
+    
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen()
+        alvoCifra.requestFullscreen()
             .catch(err => console.log(`Erro ao ativar tela cheia: ${err.message}`));
     } else {
         if (document.exitFullscreen) {
@@ -896,7 +949,7 @@ function processarTextoECifrasAutomatico(textoBruto) {
         }
 
         if (ehLinhaDeAcordes(linhaAtual) && i + 1 < lines.length && !ehLinhaDeAcordes(lines[i + 1])) {
-            let linhaCifras = linhaAtual;
+            let linhaCifras = inlineCifras = linhaAtual;
             let linhaTexto = lines[i + 1];
             i++; 
 
@@ -912,7 +965,7 @@ function processarTextoECifrasAutomatico(textoBruto) {
             let trackerIndexLeitura = 0;
 
             tokensPalavras.forEach((palavra) => {
-                let largadaPalavra = AppObterIndexAjustado(linhaTexto, palavra, trackerIndexLeitura);
+                let largadaPalavra = AppObterIndexAjustado(linhaTexto, palabra, trackerIndexLeitura);
                 trackerIndexLeitura = largadaPalavra + palavra.length;
 
                 let acordeAlocado = '';
@@ -1499,6 +1552,9 @@ function salvarTomAtualComoDefinitivo() {
     }
 }
 
+/* ==========================================================================
+   MODIFICADO: INJETA O BOTÃO DE VOLTAR INTERNO DIRETAMENTE NA MONTAGEM DA CIFRA
+   ========================================================================== */
 function renderizarCifraPronta(){
     const m = musicaAtivaVisualizacao;
     if(!m) return;
@@ -1518,6 +1574,18 @@ function renderizarCifraPronta(){
 
     const container = document.getElementById('view-corpo-cifra');
     container.innerHTML = '';
+
+    // Cria e adiciona o botão de retorno específico do modo Tela Cheia
+    const btnVoltarFS = document.createElement('button');
+    btnVoltarFS.className = 'btn-voltar-fullscreen';
+    btnVoltarFS.innerText = '← Voltar';
+    btnVoltarFS.onclick = (e) => {
+        e.stopPropagation();
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    };
+    container.appendChild(btnVoltarFS);
 
     m.estrutura.forEach(linha=>{
         const divLinha = document.createElement('div');
@@ -1659,10 +1727,13 @@ function mudarVelocidadeScroll(fator) {
     }
 }
 
+/* ==========================================================================
+   CORRIGIDO: COMPORTAMENTO DO VERIFICADOR DE TELA ATIVA NO EDITOR DE GRADE
+   ========================================================================== */
 document.addEventListener('click', (e) => {
     const seletor = document.getElementById('seletor-flutuante');
     if(!seletor) return;
-    if(document.getElementById('tela-editor').classList.contains('active')) return;
+    if(document.getElementById('tela-editor').classList.contains('ativa')) return;
     
     if(!e.target.closest('.palavra-box') && !e.target.closest('.seletor-acordes')) {
         seletor.style.display = 'none';
