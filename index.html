@@ -794,12 +794,18 @@ function sairDaIntroducao() {
     setTimeout(() => { splash.style.display = 'none'; }, 500);
 }
 
-function navegarPara(idTela){
+function navegarPara(idTela, ignorarHistorico = false){
     pararAutoScroll(); 
     document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
     document.getElementById(idTela).classList.add('ativa');
     window.scrollTo({ top: 0 });
+
+    // Se NÃO for o botão voltar físico do celular, adiciona a tela ao histórico
+    if (!ignorarHistorico) {
+        history.pushState({ tela: idTela }, "", "");
+    }
 }
+
 
 function atualizarContadoresInterface(){
     const elem = document.getElementById('txt-contador-home');
@@ -1746,6 +1752,18 @@ try {
 } catch(err) {
     console.error("Erro na inicialização da interface gráfica:", err);
 }
+
+// 1. Registra a tela inicial ('tela-home') assim que o app carrega
+history.replaceState({ tela: 'tela-home' }, "", "");
+
+// 2. Escuta o botão "Voltar" físico do celular ou do navegador
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.tela) {
+        // Passamos 'true' para ele apenas mudar a tela visualmente, sem criar novo histórico
+        navegarPara(event.state.tela, true);
+    }
+});
+
 </script>
 
 </body>
