@@ -24,6 +24,7 @@
     --cor-edicao: #3b82f6;
     --blur-padrao: blur(16px);
     --zoom-fonte-base: 1.15rem;
+    --palco-colunas: 0;
 }
 
 body.modo-claro {
@@ -356,6 +357,7 @@ textarea {
     border: 1px dashed transparent;
     cursor: pointer;
 }
+
 .palavra-box:hover {
     background: rgba(255,255,255,0.04);
 }
@@ -365,14 +367,17 @@ textarea {
     background: rgba(0, 245, 160, 0.1) !important;
 }
 
-.acorde-tag {
-    color: var(--cor-acorde);
-    font-weight: 700;
-    min-height: 22px;
-    font-size: calc(var(--zoom-fonte-base) * 0.9);
-    white-space: nowrap;
-    text-align: center;
-    letter-spacing: 0.02em;
+.acorde-tag{
+    color:#ffb52e;
+    font-size:1rem;
+    font-weight:700;
+
+    background:none;
+    border:none;
+    box-shadow:none;
+
+    margin-bottom:8px;
+    min-height:22px;
 }
 .texto-tag { font-size: var(--zoom-fonte-base); color: rgba(255,255,255,0.85); font-family: inherit; }
 
@@ -437,100 +442,81 @@ textarea {
     border: 1px solid var(--borda);
 }
 
+/* ==========================================================================
+   MODO PALCO PREMIUM INTEGRADO
+   ========================================================================== */
 body.modo-palco-global {
     background: #000000 !important;
+    background-image: none !important;
     padding: 0 !important;
+    user-select: none;
 }
 body.modo-palco-global .alternador-tema-global,
-body.modo-palco-global #splash-screen {
+body.modo-palco-global #splash-screen,
+body.modo-palco-global .controles-capo,
+body.modo-palco-global .controles-visibilidade,
+body.modo-palco-global #btn-salvar-novo-tom {
     display: none !important;
 }
 body.modo-palco-global .container {
     max-width: 100vw !important;
     width: 100vw !important;
+    padding: 0 !important;
 }
 body.modo-palco-global .tela {
     display: none !important;
 }
 body.modo-palco-global .tela#tela-visualizar {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
     background: #000000 !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 30px 40px !important;
-    border-radius: 0 !important;
+    padding: 0 !important;
     min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    border-radius: 0;
 }
 body.modo-palco-global .topo-visualizacao {
-    background: #09090b;
-    padding: 15px 25px !important;
-    border: 1px solid #222 !important;
-    border-radius: 12px;
+    background: #09090b !important;
+    padding: 16px 32px !important;
+    border-bottom: 3px solid var(--cor-primaria) !important;
+    border-radius: 0px;
     position: sticky;
-    top: 10px;
+    top: 0;
+    margin-bottom: 0px;
     z-index: 100;
 }
 body.modo-palco-global #view-corpo-cifra {
     background: transparent !important;
     border: none !important;
-    padding: 40px 10px !important;
-    max-height: 70vh;
+    padding: 40px 50px 140px 50px !important;
+    max-height: calc(100vh - 85px) !important;
+    height: calc(100vh - 85px) !important;
+    overflow-y: auto;
+    line-height: 3.2;
+    column-count: var(--palco-colunas);
+    column-gap: 60px;
+}
+body.modo-palco-global .linha-musica {
+    break-inside: avoid;
+    margin-bottom: 24px;
 }
 body.modo-palco-global .texto-tag {
     color: #ffffff !important;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: calc(var(--zoom-fonte-base) * 1.15);
 }
 body.modo-palco-global .acorde-tag {
-    color: #ffb020 !important;
-    text-shadow: 0 0 12px rgba(255,176,32,0.4);
-}
-
-/* ==========================================================================
-   CONFIGURAÇÕES EXCLUSIVAS DE TELA CHEIA ISOLADA (ESTILO PERFEITO NA FOTO)
-   ========================================================================== */
-.btn-voltar-fullscreen {
-    display: none;
-}
-
-#view-corpo-cifra:fullscreen {
-    position: relative;
-    max-height: 100vh !important;
-    width: 100vw !important;
-    background: var(--bg-principal) !important;
-    padding: 90px 40px 40px 40px !important;
-    overflow-y: auto !important;
-    border: none !important;
-    border-radius: 0 !important;
-}
-
-#view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
-    display: inline-flex;
-    position: fixed;
-    top: 25px;
-    left: 25px;
-    padding: 10px 22px;
-    font-size: 0.9rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fafafa;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 999999;
-    backdrop-filter: blur(4px);
-    transition: all 0.2s ease;
-}
-
-#view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
-    background: rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #09090b;
-}
-body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
-    background: rgba(0, 0, 0, 0.12);
+    color: var(--cor-primaria) !important;
+    font-weight: 900; 
+    font-size: calc(var(--zoom-fonte-base) * 1.4);
+    text-shadow: none !important; 
+    background: rgba(0, 245, 160, 0.14);
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -545,6 +531,7 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
     .topo-visualizacao { flex-direction: column; align-items: flex-start; gap: 16px; }
     .painel-controles-mestre { width: 100%; justify-content: flex-start; }
     #view-corpo-cifra { max-height: 45vh; padding: 15px; }
+    body.modo-palco-global #view-corpo-cifra { max-height: calc(100vh - 140px) !important; height: calc(100vh - 140px) !important; padding: 20px !important; }
 }
 </style>
 </head>
@@ -667,11 +654,18 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
             <div>
                 <h2 id="view-nome" style="border:none; padding:0; margin-bottom:4px;">Nome da Música</h2>
                 <p id="view-detalhes" style="color: var(--texto-escuro); font-size: 0.9rem;"></p>
+                <span id="palco-proxima-musica" style="display:none; font-size:0.75rem; font-weight:bold; color:var(--cor-acorde); background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; margin-top:4px;"></span>
             </div>
             
             <div class="painel-controles-mestre">
+                <div id="palco-hud-relogio" style="display:none; font-family:monospace; font-size:1.1rem; font-weight:bold; color:var(--cor-primaria); background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:6px; border:1px solid var(--borda); align-items:center;">🕒 00:00</div>
+
                 <div class="controles-visibilidade">
                     <button id="btn-toggle-cifras" onclick="alternarExibicaoCifras()">👁️ Ocultar Cifras</button>
+                </div>
+
+                <div id="palco-ctrl-colunas" style="display:none; align-items:center; background:rgba(0,0,0,0.2); padding:6px 12px; border-radius:8px; border:1px solid var(--borda);">
+                    <button onclick="alternarLayoutColunasPalco()">📄 Colunas (1/2)</button>
                 </div>
 
                 <div class="controles-zoom">
@@ -703,25 +697,29 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
                 </div>
 
                 <div class="controles-tom">
-                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro);">TOM</span>
-                    <button onclick="ajustarTom(-1)">-</button>
-                    <span id="txt-tom-relativo" style="font-size:0.8rem; font-weight:600; min-width:40px; text-align:center;">Tom: 0</span>
-                    <button onclick="ajustarTom(1)">+</button>
+                    <span style="font-size:0.7rem;font-weight:700;color:var(--texto-escuro);">TOM</span>
+                    <select id="seletor-tom" onchange="trocarTomSelecionado(this.value)"></select>
                 </div>
                 
                 <button id="btn-salvar-novo-tom" class="sucesso" style="display:none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem;" onclick="salvarTomAtualComoDefinitivo()">
                     💾 Fixar Tom
                 </button>
+
+                <button id="btn-palco-hud-sair" style="display:none; background:rgba(239, 68, 68, 0.2); border:1px solid rgba(239, 68, 68, 0.4); color:#fca5a5; padding:6px 12px; border-radius:8px; font-size:0.8rem;" onclick="alternarModoPalcoCompleto()">❌ Sair</button>
             </div>
         </div>
         
         <div id="view-corpo-cifra"></div>
         
-        <div style="margin-top: 30px; display:flex; gap:12px; justify-content: space-between; flex-wrap: wrap;">
+        <div id="palco-toque-nav" style="display:none;">
+            <button onclick="dispararTransicaoMusicaPlaylist(-1)" style="position:fixed; left:12px; bottom:15px; z-index:99999; border-radius:50%; width:48px; height:48px; background:rgba(0,0,0,0.6); border:2px solid var(--cor-primaria); color:var(--cor-primaria); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.5);">◀</button>
+            <button onclick="dispararTransicaoMusicaPlaylist(1)" style="position:fixed; right:12px; bottom:15px; z-index:99999; border-radius:50%; width:48px; height:48px; background:rgba(0,0,0,0.6); border:2px solid var(--cor-primaria); color:var(--cor-primaria); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</button>
+        </div>
+
+        <div id="view-botoes-rodape" style="margin-top: 30px; display:flex; gap:12px; justify-content: space-between; flex-wrap: wrap;">
             <button class="secundario" onclick="voltarDoVisualizador()">← Voltar</button>
             <div style="display:flex; gap:12px; flex-wrap: wrap;">
                 <button class="whatsapp" onclick="compartilharPorWhatsApp()">🟢 Compartilhar WhatsApp</button>
-                <button class="secundario" id="btn-fullscreen-toggle" onclick="alternarTelaCheia()" style="border-color: #3b82f6; color: #3b82f6;">🖵 Tela Cheia</button>
                 <button class="secundario" id="btn-modo-palco-toggle" onclick="alternarModoPalcoCompleto()" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">🎦 Modo Palco</button>
                 <button class="info" id="btn-editar-visualizador">✏ Editar</button>
                 <button class="perigo" id="btn-excluir-visualizador">🗑 Excluir</button>
@@ -735,12 +733,26 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
 const listaTemasFixos = ['Entrada', 'Perdão', 'Glória', 'Ofertório','Santo','Cordeiro','Comunhão','Louvor', 'Adoração','Batismo','Espirito Santo'];
 const escalaCromatica = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-const acordes = {
-    maiores: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
-    menores: ['Cm', 'C#m', 'Dm', 'D#m', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bm'],
-    setima:  ['C7', 'C#7', 'D7', 'D#7', 'E7', 'F7', 'F#7', 'G7', 'G#7', 'A7', 'A#7', 'B7']
-};
-const acordesRapidos = [...acordes.maiores, ...acordes.menores, ...acordes.setima];
+const listaTons = [
+    'C','C#','D','D#','E','F','F#','G','G#','A','A#','B',
+    'Cm','C#m','Dm','D#m','Em','Fm','F#m','Gm','G#m','Am','A#m','Bm'
+];
+
+const notas = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+const tiposAcordes = [
+    '', 'm', '5', '6', 'm6', '7', 'm7', 'maj7', '9', 'm9', '11', '13',
+    'sus2', 'sus4', 'add9', 'add11', 'dim', 'dim7', 'aug', '+', '°',
+    '7sus4', '6/9', 'maj9', 'maj13'
+];
+
+let acordesRapidos = [];
+
+notas.forEach(nota => {
+    tiposAcordes.forEach(tipo => {
+        acordesRapidos.push(nota + tipo);
+    });
+});
 
 let bancoMusicas = [];
 try {
@@ -786,6 +798,8 @@ let itemArrastadoIdx = null;
 
 let exibirCifrasNoPainel = true;
 let modoPalcoAtivo = false;
+let wakeLockPalco = null;
+let relogioPalcoInterval = null;
 
 function sairDaIntroducao() {
     const splash = document.getElementById('splash-screen');
@@ -800,12 +814,10 @@ function navegarPara(idTela, ignorarHistorico = false){
     document.getElementById(idTela).classList.add('ativa');
     window.scrollTo({ top: 0 });
 
-    // Se NÃO for o botão voltar físico do celular, adiciona a tela ao histórico
     if (!ignorarHistorico) {
         history.pushState({ tela: idTela }, "", "");
     }
 }
-
 
 function atualizarContadoresInterface(){
     const elem = document.getElementById('txt-contador-home');
@@ -862,52 +874,122 @@ function alternarExibicaoCifras() {
         btn.innerText = "👁️ Ocultar Cifras";
     } else {
         container.classList.add('ocultar-todas-cifras');
-        btn.innerText = "👁️‍🗨️ Mostrar Cifras";
+        btn.innerText = "👁️ Mostrar Cifras";
     }
 }
 
-/* ==========================================================================
-   MODIFICADO: EXECUTA FULLSCREEN SOMENTE NO CONTEÚDO DA PARTITURA E LETRA
-   ========================================================================== */
-function alternarTelaCheia() {
-    const alvoCifra = document.getElementById('view-corpo-cifra');
-    
-    if (!document.fullscreenElement) {
-        alvoCifra.requestFullscreen()
-            .catch(err => console.log(`Erro ao ativar tela cheia: ${err.message}`));
-    } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    }
-}
-
-function atualizarBotaoFullscreen() {
-    const btn = document.getElementById('btn-fullscreen-toggle');
-    if (btn) {
-        if (document.fullscreenElement) {
-            btn.innerText = "🖵 Sair da Tela Cheia";
-            btn.style.background = "rgba(59, 130, 246, 0.2)";
-        } else {
-            btn.innerText = "🖵 Tela Cheia";
-            btn.style.background = "rgba(255, 255, 255, 0.04)";
-        }
-    }
-}
-
-document.addEventListener('fullscreenchange', atualizarBotaoFullscreen);
-
-function alternarModoPalcoCompleto() {
+async function alternarModoPalcoCompleto() {
     modoPalcoAtivo = !modoPalcoAtivo;
-    const btn = document.getElementById('btn-modo-palco-toggle');
-    
+    const btnPalcoToggle = document.getElementById('btn-modo-palco-toggle');
+    const hudRelogio = document.getElementById('palco-hud-relogio');
+    const btnSairPalcoTop = document.getElementById('btn-palco-hud-sair');
+    const ctrlColunas = document.getElementById('palco-ctrl-colunas');
+    const navToque = document.getElementById('palco-toque-nav');
+    const viewBotoesRodape = document.getElementById('view-botoes-rodape');
+
     if(modoPalcoAtivo) {
         document.body.classList.add('modo-palco-global');
-        btn.innerText = "❌ Sair do Palco";
+        hudRelogio.style.display = 'flex';
+        btnSairPalcoTop.style.display = 'inline-flex';
+        ctrlColunas.style.display = 'flex';
+        navToque.style.display = 'block';
+        viewBotoesRodape.style.display = 'none';
+        document.documentElement.style.setProperty('--palco-colunas', 1);
+
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLockPalco = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) { console.warn("WakeLock não suportado:", err); }
+
+        relogioPalcoInterval = setInterval(() => {
+            const agora = new Date();
+            hudRelogio.innerText = "🕒 " + String(agora.getHours()).padStart(2, '0') + ":" + String(agora.getMinutes()).padStart(2, '0');
+        }, 1000);
+
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        }
+
+        window.addEventListener('keydown', processarPedalEKeyboardPalco);
+        atualizarMetadadosPalcoProximaMusica();
     } else {
         document.body.classList.remove('modo-palco-global');
-        btn.innerText = "🎦 Modo Palco";
+        hudRelogio.style.display = 'none';
+        btnSairPalcoTop.style.display = 'none';
+        ctrlColunas.style.display = 'none';
+        navToque.style.display = 'none';
+        viewBotoesRodape.style.display = 'flex';
+        document.getElementById('palco-proxima-musica').style.display = 'none';
+
+        if (wakeLockPalco) {
+            wakeLockPalco.release().then(() => { wakeLockPalco = null; });
+        }
+        clearInterval(relogioPalcoInterval);
+
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        }
+
+        window.removeEventListener('keydown', processarPedalEKeyboardPalco);
     }
+}
+
+function alternarLayoutColunasPalco() {
+    const rootStyles = getComputedStyle(document.documentElement);
+    const colunasAtuais = parseInt(rootStyles.getPropertyValue('--palco-colunas').trim());
+    document.documentElement.style.setProperty('--palco-colunas', colunasAtuais === 1 ? 2 : 1);
+}
+
+function atualizarMetadadosPalcoProximaMusica() {
+    const containerBadge = document.getElementById('palco-proxima-musica');
+    if (!containerBadge) return;
+
+    const listaIds = obtenerPlaylistAtivaVetorEstrategico();
+    if(listaIds.length <= 1 || !musicaAtivaVisualizacao) {
+        containerBadge.style.display = 'none';
+        return;
+    }
+
+    let idxAtual = listaIds.indexOf(musicaAtivaVisualizacao.id);
+    if(idxAtual === -1 || idxAtual === listaIds.length - 1) {
+        containerBadge.style.display = 'none';
+        return;
+    }
+
+    let proxMusicaObj = bancoMusicas.find(m => m.id === listaIds[idxAtual + 1]);
+    if (proxMusicaObj) {
+        containerBadge.innerText = `PRÓXIMA: ${proxMusicaObj.nome} (${proxMusicaObj.cantor || 'Artista'})`;
+        containerBadge.style.display = 'inline-block';
+    } else {
+        containerBadge.style.display = 'none';
+    }
+}
+
+function processarPedalEKeyboardPalco(e) {
+    if (!modoPalcoAtivo) return;
+    const boxCifra = document.getElementById('view-corpo-cifra');
+
+    if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        alternarAutoScroll();
+    } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        boxCifra.scrollBy({ top: 180, behavior: 'smooth' });
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        boxCifra.scrollBy({ top: -180, behavior: 'smooth' });
+    } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        dispararTransicaoMusicaPlaylist(1);
+    } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        dispararTransicaoMusicaPlaylist(-1);
+    }
+}
+
+function desativarModoPalcoForçado() {
+    if (modoPalcoAtivo) { alternarModoPalcoCompleto(); }
 }
 
 function processarTextoECifrasAutomatico(textoBruto) {
@@ -917,12 +999,12 @@ function processarTextoECifrasAutomatico(textoBruto) {
     function ehUmAcorde(token) {
         const limpo = token.trim().replace(/[()]/g, '');
         if (!limpo) return false;
-        const padraoAcorde = /^[A-G][b#]?(m|M|maj|min|dim|aug|sus|add|7|9|11|13|cos)*(\/[A-G][b#]?)?$/;
+        const padraoAcorde = /^[A-G](#|b)?(m|maj|min|dim|aug|sus2|sus4|add9|add11|5|6|7|9|11|13|maj7|maj9|maj13|m6|m7|m9|dim7|\+|°|6\/9|7sus4)?(\/[A-G](#|b)?)?$/;
         return padraoAcorde.test(limpo);
     }
 
     function ehLinhaDeAcordes(linha) {
-        const tokens = inline = linha.trim().split(/\s+/);
+        const tokens = linha.trim().split(/\s+/);
         if(tokens.length === 0 || linha.trim() === '') return false;
         return tokens.every(t => ehUmAcorde(t));
     }
@@ -955,7 +1037,7 @@ function processarTextoECifrasAutomatico(textoBruto) {
         }
 
         if (ehLinhaDeAcordes(linhaAtual) && i + 1 < lines.length && !ehLinhaDeAcordes(lines[i + 1])) {
-            let linhaCifras = inlineCifras = linhaAtual;
+            let linhaCifras = linhaAtual;
             let linhaTexto = lines[i + 1];
             i++; 
 
@@ -971,7 +1053,7 @@ function processarTextoECifrasAutomatico(textoBruto) {
             let trackerIndexLeitura = 0;
 
             tokensPalavras.forEach((palavra) => {
-                let largadaPalavra = AppObterIndexAjustado(linhaTexto, palabra, trackerIndexLeitura);
+                let largadaPalavra = AppObterIndexAjustado(linhaTexto, palavra, trackerIndexLeitura);
                 trackerIndexLeitura = largadaPalavra + palavra.length;
 
                 let acordeAlocado = '';
@@ -1005,6 +1087,34 @@ function AppObterIndexAjustado(texto, palavra, start) {
     return pos === -1 ? start : pos;
 }
 
+function detectarTomAutomaticamente(estrutura) {
+    const contagem = {};
+
+    estrutura.forEach(linha => {
+        linha.forEach(palavra => {
+            if (!palavra.acorde) return;
+            let acorde = palavra.acorde;
+            acorde = acorde.split("/")[0];
+            acorde = acorde.replace(/(maj7|maj9|maj13|m7|m9|7|9|11|13|sus2|sus4|add9|add11|dim7|dim|aug|\+|°|5|6\/9|7sus4)/g, "");
+
+            if (!contagem[acorde]) contagem[acorde] = 0;
+            contagem[acorde]++;
+        });
+    });
+
+    let maisUsado = "C";
+    let maiorQtd = 0;
+
+    Object.keys(contagem).forEach(acorde => {
+        if (contagem[acorde] > maiorQtd) {
+            maiorQtd = contagem[acorde];
+            maisUsado = acorde;
+        }
+    });
+
+    return maisUsado;
+}
+
 function avancarParaEditor(){
     const idEdicao = document.getElementById('cad-id-edicao').value;
     const nome = document.getElementById('cad-nome').value.trim();
@@ -1019,6 +1129,8 @@ function avancarParaEditor(){
     }
 
     const linhasTratadas = processarTextoECifrasAutomatico(letraBruta);
+    const tomDetectado = detectarTomAutomaticamente(linhasTratadas);
+    document.getElementById("cad-tom").value = tomDetectado;
 
     musicaEmConstrucao = {
         id: idEdicao ? Number(idEdicao) : Date.now(),
@@ -1047,7 +1159,7 @@ function renderizarPainelEditorGrade() {
             
             box.onclick = (e)=>{
                 e.stopPropagation();
-                alvoPalavra = { linha: lIdx, palavra: pIdx }; 
+                alvoPalavra = { linha: lIdx, word: pIdx, palavra: pIdx }; 
                 const seletor = document.getElementById('seletor-flutuante');
                 seletor.style.display = 'grid';
             };
@@ -1451,7 +1563,7 @@ function transporAcorde(acorde, semitons){
     return acorde.split(' ').map(ac => {
         const partes = ac.split('/');
         return partes.map(parte => {
-            const match = parte.match(/^([A-G]#?|b?)(.*)/);
+            const match = parte.match(/^([A-G][#b]?)(.*)/);
             if(!match) return parte;
 
             let notaBase = match[1];
@@ -1479,6 +1591,8 @@ function abrirVisualizador(id, origem){
     if(!musicaAtivaVisualizacao) return;
     
     deslocamentoTomAtual = 0;
+    preencherSeletorTom();
+    document.getElementById("seletor-tom").value = musicaAtivaVisualizacao.tomBase;
     capoAtual = 0;
     exibirCifrasNoPainel = true; 
     document.getElementById('seletor-capo').value = "0";
@@ -1492,17 +1606,8 @@ function abrirVisualizador(id, origem){
 
     resetMecanismoScroll();
     renderizarCifraPronta();
-    atualizarBotaoFullscreen();
+    if(modoPalcoAtivo) { atualizarMetadadosPalcoProximaMusica(); }
     navegarPara('tela-visualizar');
-}
-
-function desativarModoPalcoForçado() {
-    modoPalcoAtivo = false;
-    document.body.classList.remove('modo-palco-global');
-    document.getElementById('btn-modo-palco-toggle').innerText = "🎦 Modo Palco";
-    if (document.fullscreenElement && document.exitFullscreen) { 
-        document.exitFullscreen().catch(() => {}); 
-    }
 }
 
 function voltarDoVisualizador(){
@@ -1513,6 +1618,34 @@ function voltarDoVisualizador(){
         if(telaOrigemVisualizador === 'tela-playlist-detalhe') verDetalhesPlaylist(playlistAtivaId);
         else navegarPara(telaOrigemVisualizador);
     }
+}
+
+function preencherSeletorTom() {
+    const select = document.getElementById("seletor-tom");
+    select.innerHTML = "";
+
+    textOptions = "";
+    listaTons.forEach(tom => {
+        const option = document.createElement("option");
+        option.value = tom;
+        option.textContent = tom;
+        select.appendChild(option);
+    });
+}
+
+function trocarTomSelecionado(novoTom){
+    const tomOriginal = musicaAtivaVisualizacao.tomBase;
+
+    const notaOriginal = tomOriginal.replace("m","");
+    const notaNova = novoTom.replace("m","");
+
+    const indiceOriginal = escalaCromatica.indexOf(notaOriginal);
+    const indiceNovo = escalaCromatica.indexOf(notaNova);
+
+    if(indiceOriginal === -1 || indiceNovo === -1) return;
+
+    deslocamentoTomAtual = indiceNovo - indiceOriginal;
+    renderizarCifraPronta();
 }
 
 function ajustarTom(direcao){
@@ -1558,9 +1691,6 @@ function salvarTomAtualComoDefinitivo() {
     }
 }
 
-/* ==========================================================================
-   MODIFICADO: INJETA O BOTÃO DE VOLTAR INTERNO DIRETAMENTE NA MONTAGEM DA CIFRA
-   ========================================================================== */
 function renderizarCifraPronta(){
     const m = musicaAtivaVisualizacao;
     if(!m) return;
@@ -1573,25 +1703,12 @@ function renderizarCifraPronta(){
         infoApoioInstrumento += ` | (Capo ${capoAtual}ª casa: Formato em ${transporAcorde(tomRealOuvido, -capoAtual)})`;
     }
     document.getElementById('view-detalhes').innerText = infoApoioInstrumento;
-    document.getElementById('txt-tom-relativo').innerText = `Tom: ${deslocamentoTomAtual >= 0 ? '+' : ''}${deslocamentoTomAtual}`;
 
     const btnSalvarTom = document.getElementById('btn-salvar-novo-tom');
     btnSalvarTom.style.display = (deslocamentoTomAtual !== 0) ? "inline-flex" : "none";
 
     const container = document.getElementById('view-corpo-cifra');
     container.innerHTML = '';
-
-    // Cria e adiciona o botão de retorno específico do modo Tela Cheia
-    const btnVoltarFS = document.createElement('button');
-    btnVoltarFS.className = 'btn-voltar-fullscreen';
-    btnVoltarFS.innerText = '← Voltar';
-    btnVoltarFS.onclick = (e) => {
-        e.stopPropagation();
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        }
-    };
-    container.appendChild(btnVoltarFS);
 
     m.estrutura.forEach(linha=>{
         const divLinha = document.createElement('div');
@@ -1722,10 +1839,10 @@ function pararAutoScroll() {
 }
 
 function mudarVelocidadeScroll(fator) {
-    let novaVelocidade = velocidadScrollAtual + fator;
-    if (novaVelocidade < 1) novaVelocidade = 1;
-    if (novaVelocidade > 5) novaVelocidade = 5;
-    velocidadScrollAtual = novaVelocidade;
+    let novaVelocidadeCalculada = velocidadScrollAtual + fator;
+    if (novaVelocidadeCalculada < 1) novaVelocidadeCalculada = 1;
+    if (novaVelocidadeCalculada > 5) novaVelocidadeCalculada = 5;
+    velocidadScrollAtual = novaVelocidadeCalculada;
     document.getElementById('txt-velocidade-scroll').innerText = velocidadScrollAtual + "x";
     if (executandoScroll) {
         pararAutoScroll();
@@ -1733,13 +1850,9 @@ function mudarVelocidadeScroll(fator) {
     }
 }
 
-/* ==========================================================================
-   CORRIGIDO: COMPORTAMENTO DO VERIFICADOR DE TELA ATIVA NO EDITOR DE GRADE
-   ========================================================================== */
 document.addEventListener('click', (e) => {
     const seletor = document.getElementById('seletor-flutuante');
     if(!seletor) return;
-    if(document.getElementById('tela-editor').classList.contains('ativa')) return;
     
     if(!e.target.closest('.palavra-box') && !e.target.closest('.seletor-acordes')) {
         seletor.style.display = 'none';
@@ -1753,17 +1866,13 @@ try {
     console.error("Erro na inicialização da interface gráfica:", err);
 }
 
-// 1. Registra a tela inicial ('tela-home') assim que o app carrega
 history.replaceState({ tela: 'tela-home' }, "", "");
 
-// 2. Escuta o botão "Voltar" físico do celular ou do navegador
 window.addEventListener('popstate', (event) => {
     if (event.state && event.state.tela) {
-        // Passamos 'true' para ele apenas mudar a tela visualmente, sem criar novo histórico
         navegarPara(event.state.tela, true);
     }
 });
-
 </script>
 
 </body>
