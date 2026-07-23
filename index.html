@@ -423,7 +423,8 @@ textarea {
     padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; background: rgba(255,255,255,0.04); color: var(--texto-claro); border: 1px solid var(--borda);
 }
 .controles-tom button:hover, .controles-rolagem button:hover, .controles-zoom button:hover, .controles-visibilidade button:hover { background: rgba(255,255,255,0.12); }
-.controles-capo select { width: auto; padding: 2px 6px; background: transparent; border: none; color: var(--cor-primaria); font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+.controles-capo select, .controles-tom select { width: auto; padding: 2px 6px; background: transparent; border: none; color: var(--cor-primaria); font-weight: 600; cursor: pointer; font-size: 0.8rem; outline: none; }
+.controles-tom select option { background: #121215; color: #fff; }
 
 .btn-scroll-ativo { background: var(--cor-primaria) !important; color: #000 !important; font-weight: bold; }
 
@@ -454,7 +455,6 @@ body.modo-palco-global .container {
 }
 body.modo-palco-global .tela {
     display: none !important;
-    
 }
 body.modo-palco-global .tela#tela-visualizar {
     display: block !important;
@@ -489,54 +489,6 @@ body.modo-palco-global .acorde-tag {
     text-shadow: 0 0 12px rgba(255,176,32,0.4);
 }
 
-/* ==========================================================================
-   CONFIGURAÇÕES EXCLUSIVAS DE TELA CHEIA ISOLADA (ESTILO PERFEITO NA FOTO)
-   ========================================================================== */
-.btn-voltar-fullscreen {
-    display: none;
-}
-
-#view-corpo-cifra:fullscreen {
-    position: relative;
-    max-height: 100vh !important;
-    width: 100vw !important;
-    background: var(--bg-principal) !important;
-    padding: 90px 40px 40px 40px !important;
-    overflow-y: auto !important;
-    border: none !important;
-    border-radius: 0 !important;
-}
-
-#view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
-    display: inline-flex;
-    position: fixed;
-    top: 25px;
-    left: 25px;
-    padding: 10px 22px;
-    font-size: 0.9rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fafafa;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 999999;
-    backdrop-filter: blur(4px);
-    transition: all 0.2s ease;
-}
-
-#view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen {
-    background: rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #09090b;
-}
-body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
-    background: rgba(0, 0, 0, 0.12);
-}
-
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
@@ -550,7 +502,6 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
     .painel-controles-mestre { width: 100%; justify-content: flex-start; }
     #view-corpo-cifra { max-height: 45vh; padding: 15px; }
 }
-
 </style>
 </head>
 <body>
@@ -615,15 +566,21 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
     </div>
 
     <div id="tela-editor" class="tela">
-        <h2>Montagem de Grade de Acordes</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <h2 style="margin-bottom:0;">Montagem de Grade de Acordes</h2>
+            <div style="display:flex; gap:10px;">
+                <button class="secundario" onclick="navegarPara('tela-cadastro')">← Voltar</button>
+                <button class="sucesso" onclick="finalizarESalvar()">💾 Salvar Cifra</button>
+            </div>
+        </div>
         <p style="color: var(--texto-escuro); margin-bottom: 24px; font-size: 0.9rem;">
-            💡 <strong>Smart Editor:</strong> Selecione uma palavra para abrir o painel OU <strong>arraste um acorde</strong> diretamente da barra inferior e solte-o na palavra desejada!
+            💡 <strong>Smart Editor:</strong> Selecione uma palavra para abrir o painel de acordes OU <strong>arraste um acorde</strong> e solte-o na palavra desejada!
         </p>
         <div id="editor-fluxo-palavras" style="background: rgba(0,0,0,0.2); padding: 25px; border-radius: 14px; border: 1px solid var(--borda);"></div>
         <div id="seletor-flutuante" class="seletor-acordes"></div>
-        <div style="display:flex; gap:12px; margin-top:30px; justify-content: flex-end;">
+        <div style="display:flex; gap:12px; margin-top:30px; justify-content: flex-end; flex-wrap:wrap;">
             <button class="secundario" onclick="navegarPara('tela-cadastro')">Voltar ao Formulário</button>
-            <button onclick="finalizarESalvar()">💾 Confirmar e Salvar Cifra</button>
+            <button class="sucesso" onclick="finalizarESalvar()" style="font-size:1rem; padding:16px 32px;">💾 Confirmar e Salvar Cifra</button>
         </div>
     </div>
 
@@ -636,7 +593,7 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
             <label style="margin-bottom:12px;">Pastas Temáticas</label>
             <div class="grid-pastas" id="container-pastas-temas"></div>
         </div>
-        <div id="bloco-lista-musicas" style="margin-top: 15px; display: none;">
+        <div id="bloco-lista-musicas" style="margin-top: 15px; display: block;">
             <label style="margin-bottom:12px;">Todas as Músicas Encontradas</label>
             <div id="lista-cifras-renderizada"></div>    
         </div>
@@ -672,18 +629,11 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
             <div>
                 <h2 id="view-nome" style="border:none; padding:0; margin-bottom:4px;">Nome da Música</h2>
                 <p id="view-detalhes" style="color: var(--texto-escuro); font-size: 0.9rem;"></p>
-                <span id="palco-proxima-musica" style="display:none; font-size:0.75rem; font-weight:bold; color:var(--cor-acorde); background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; margin-top:4px;"></span>
             </div>
             
             <div class="painel-controles-mestre">
-                <div id="palco-hud-relogio" style="display:none; font-family:monospace; font-size:1.1rem; font-weight:bold; color:var(--cor-primaria); background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:6px; border:1px solid var(--borda); align-items:center;">🕒 00:00</div>
-
                 <div class="controles-visibilidade">
                     <button id="btn-toggle-cifras" onclick="alternarExibicaoCifras()">👁️ Ocultar Cifras</button>
-                </div>
-
-                <div id="palco-ctrl-colunas" style="display:none; align-items:center; background:rgba(0,0,0,0.2); padding:6px 12px; border-radius:8px; border:1px solid var(--borda);">
-                    <button onclick="alternarLayoutColunasPalco()">📄 Colunas (1/2)</button>
                 </div>
 
                 <div class="controles-zoom">
@@ -715,28 +665,40 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
                 </div>
 
                 <div class="controles-tom">
-                    <span style="font-size:0.7rem;font-weight:700;color:var(--texto-escuro);">TOM</span>
-                    <select id="seletor-tom" onchange="trocarTomSelecionado(this.value)"></select>
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--texto-escuro);">TOM</span>
+                    <button onclick="ajustarTom(-1)">-</button>
+                    <select id="seletorTom" onchange="mudarTomSelecionado()">
+                        <option value="C">C</option>
+                        <option value="C#">C#</option>
+                        <option value="D">D</option>
+                        <option value="D#">D#</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="F#">F#</option>
+                        <option value="G">G</option>
+                        <option value="G#">G#</option>
+                        <option value="A">A</option>
+                        <option value="A#">A#</option>
+                        <option value="B">B</option>
+                    </select>
+                    <button onclick="ajustarTom(1)">+</button>
+                    <span id="txt-tom-relativo" style="font-size:0.8rem; font-weight:600; min-width:32px; text-align:center;">(0)</span>
                 </div>
                 
                 <button id="btn-salvar-novo-tom" class="sucesso" style="display:none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem;" onclick="salvarTomAtualComoDefinitivo()">
                     💾 Fixar Tom
                 </button>
-
-                <button id="btn-palco-hud-sair" style="display:none; background:rgba(239, 68, 68, 0.2); border:1px solid rgba(239, 68, 68, 0.4); color:#fca5a5; padding:6px 12px; border-radius:8px; font-size:0.8rem;" onclick="alternarModoPalcoCompleto()">❌ Sair</button>
             </div>
         </div>
         
         <div id="view-corpo-cifra"></div>
         
-        <div id="palco-toque-nav" style="display:none;">
-            <button onclick="dispararTransicaoMusicaPlaylist(-1)" style="position:fixed; left:12px; bottom:15px; z-index:99999; border-radius:50%; width:48px; height:48px; background:rgba(0,0,0,0.6); border:2px solid var(--cor-primaria); color:var(--cor-primaria); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.5);">◀</button>
-            <button onclick="dispararTransicaoMusicaPlaylist(1)" style="position:fixed; right:12px; bottom:15px; z-index:99999; border-radius:50%; width:48px; height:48px; background:rgba(0,0,0,0.6); border:2px solid var(--cor-primaria); color:var(--cor-primaria); font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</button>
-        </div>
-
-        <div id="view-botoes-rodape" style="margin-top: 30px; display:flex; gap:12px; justify-content: space-between; flex-wrap: wrap;">
+        <div style="margin-top: 30px; display:flex; gap:12px; justify-content: space-between; flex-wrap: wrap;">
             <button class="secundario" onclick="voltarDoVisualizador()">← Voltar</button>
-            <div style="display:flex; gap:12px; flex-wrap: wrap;">
+            <div style="display:flex; gap:12px; flex-wrap: wrap; align-items:center;">
+                <select id="seletor-add-playlist-view" class="secundario" style="padding: 10px; font-size: 0.85rem; width: auto;" onchange="adicionarMusicaAtualAPlaylist(this.value)">
+                    <option value="">+ Add ao Repertório...</option>
+                </select>
                 <button class="whatsapp" onclick="compartilharPorWhatsApp()">🟢 Compartilhar WhatsApp</button>
                 <button class="secundario" id="btn-modo-palco-toggle" onclick="alternarModoPalcoCompleto()" style="border-color: var(--cor-primaria); color: var(--cor-primaria);">🎦 Modo Palco</button>
                 <button class="info" id="btn-editar-visualizador">✏ Editar</button>
@@ -751,21 +713,18 @@ body.modo-claro #view-corpo-cifra:fullscreen .btn-voltar-fullscreen:hover {
 const listaTemasFixos = ['Entrada', 'Perdão', 'Glória', 'Ofertório','Santo','Cordeiro','Comunhão','Louvor', 'Adoração','Batismo','Espirito Santo'];
 const escalaCromatica = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-const listaTons = [
-    'C','C#','D','D#','E','F','F#','G','G#','A','A#','B',
-    'Cm','C#m','Dm','D#m','Em','Fm','F#m','Gm','G#m','Am','A#m','Bm'
+const notas = [
+"C","C#","D","D#","E","F",
+"F#","G","G#","A","A#","B"
 ];
-
-const notas = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 
 const tiposAcordes = [
-    '', 'm', '5', '6', 'm6', '7', 'm7', 'maj7', '9', 'm9', '11', '13',
-    'sus2', 'sus4', 'add9', 'add11', 'dim', 'dim7', 'aug', '+', '°',
-    '7sus4', '6/9', 'maj9', 'maj13'
+"", "m", "5", "6", "7", "9", "11", "13", "maj7", "maj9", 
+"m6", "m7", "m9", "m11", "m13", "add9", "add11", "sus2", 
+"sus4", "7sus4", "dim", "dim7", "m7b5", "aug"
 ];
 
-let acordesRapidos = [];
-
+const acordesRapidos = [];
 notas.forEach(nota => {
     tiposAcordes.forEach(tipo => {
         acordesRapidos.push(nota + tipo);
@@ -816,8 +775,6 @@ let itemArrastadoIdx = null;
 
 let exibirCifrasNoPainel = true;
 let modoPalcoAtivo = false;
-let wakeLockPalco = null;
-let relogioPalcoInterval = null;
 
 function sairDaIntroducao() {
     const splash = document.getElementById('splash-screen');
@@ -892,133 +849,30 @@ function alternarExibicaoCifras() {
         btn.innerText = "👁️ Ocultar Cifras";
     } else {
         container.classList.add('ocultar-todas-cifras');
-        btn.innerText = "👁️ Mostrar Cifras";
+        btn.innerText = "👁️‍🗨️ Mostrar Cifras";
     }
 }
 
-async function alternarModoPalcoCompleto() {
+function alternarModoPalcoCompleto() {
     modoPalcoAtivo = !modoPalcoAtivo;
-    const btnPalcoToggle = document.getElementById('btn-modo-palco-toggle');
-    const hudRelogio = document.getElementById('palco-hud-relogio');
-    const btnSairPalcoTop = document.getElementById('btn-palco-hud-sair');
-    const ctrlColunas = document.getElementById('palco-ctrl-colunas');
-    const navToque = document.getElementById('palco-toque-nav');
-    const viewBotoesRodape = document.getElementById('view-botoes-rodape');
-
+    const btn = document.getElementById('btn-modo-palco-toggle');
+    
     if(modoPalcoAtivo) {
         document.body.classList.add('modo-palco-global');
-        hudRelogio.style.display = 'flex';
-        btnSairPalcoTop.style.display = 'inline-flex';
-        ctrlColunas.style.display = 'flex';
-        navToque.style.display = 'block';
-        viewBotoesRodape.style.display = 'none';
-        document.documentElement.style.setProperty('--palco-colunas', 1);
-
-        try {
-            if ('wakeLock' in navigator) {
-                wakeLockPalco = await navigator.wakeLock.request('screen');
-            }
-        } catch (err) { console.warn("WakeLock não suportado:", err); }
-
-        relogioPalcoInterval = setInterval(() => {
-            const agora = new Date();
-            hudRelogio.innerText = "🕒 " + String(agora.getHours()).padStart(2, '0') + ":" + String(agora.getMinutes()).padStart(2, '0');
-        }, 1000);
-
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(() => {});
-        }
-
-        window.addEventListener('keydown', processarPedalEKeyboardPalco);
-        atualizarMetadadosPalcoProximaMusica();
+        btn.innerText = "❌ Sair do Palco";
     } else {
         document.body.classList.remove('modo-palco-global');
-        hudRelogio.style.display = 'none';
-        btnSairPalcoTop.style.display = 'none';
-        ctrlColunas.style.display = 'none';
-        navToque.style.display = 'none';
-        viewBotoesRodape.style.display = 'flex';
-        document.getElementById('palco-proxima-musica').style.display = 'none';
-
-        if (wakeLockPalco) {
-            wakeLockPalco.release().then(() => { wakeLockPalco = null; });
-        }
-        clearInterval(relogioPalcoInterval);
-
-        if (document.fullscreenElement && document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
-        }
-
-        window.removeEventListener('keydown', processarPedalEKeyboardPalco);
+        btn.innerText = "🎦 Modo Palco";
     }
-}
-
-function alternarLayoutColunasPalco() {
-    const rootStyles = getComputedStyle(document.documentElement);
-    const colunasAtuais = parseInt(rootStyles.getPropertyValue('--palco-colunas').trim());
-    document.documentElement.style.setProperty('--palco-colunas', colunasAtuais === 1 ? 2 : 1);
-}
-
-function atualizarMetadadosPalcoProximaMusica() {
-    const containerBadge = document.getElementById('palco-proxima-musica');
-    if (!containerBadge) return;
-
-    const listaIds = obtenerPlaylistAtivaVetorEstrategico();
-    if(listaIds.length <= 1 || !musicaAtivaVisualizacao) {
-        containerBadge.style.display = 'none';
-        return;
-    }
-
-    let idxAtual = listaIds.indexOf(musicaAtivaVisualizacao.id);
-    if(idxAtual === -1 || idxAtual === listaIds.length - 1) {
-        containerBadge.style.display = 'none';
-        return;
-    }
-
-    let proxMusicaObj = bancoMusicas.find(m => m.id === listaIds[idxAtual + 1]);
-    if (proxMusicaObj) {
-        containerBadge.innerText = `PRÓXIMA: ${proxMusicaObj.nome} (${proxMusicaObj.cantor || 'Artista'})`;
-        containerBadge.style.display = 'inline-block';
-    } else {
-        containerBadge.style.display = 'none';
-    }
-}
-
-function processarPedalEKeyboardPalco(e) {
-    if (!modoPalcoAtivo) return;
-    const boxCifra = document.getElementById('view-corpo-cifra');
-
-    if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault();
-        alternarAutoScroll();
-    } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        e.preventDefault();
-        boxCifra.scrollBy({ top: 180, behavior: 'smooth' });
-    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        e.preventDefault();
-        boxCifra.scrollBy({ top: -180, behavior: 'smooth' });
-    } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        dispararTransicaoMusicaPlaylist(1);
-    } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        dispararTransicaoMusicaPlaylist(-1);
-    }
-}
-
-function desativarModoPalcoForçado() {
-    if (modoPalcoAtivo) { alternarModoPalcoCompleto(); }
 }
 
 function processarTextoECifrasAutomatico(textoBruto) {
     const lines = textoBruto.split('\n');
     let estruturaFinal = [];
 
-    function ehUmAcorde(token) {
-        const limpo = token.trim().replace(/[()]/g, '');
-        if (!limpo) return false;
-        const padraoAcorde = /^[A-G](#|b)?(m|maj|min|dim|aug|sus2|sus4|add9|add11|5|6|7|9|11|13|maj7|maj9|maj13|m6|m7|m9|dim7|\+|°|6\/9|7sus4)?(\/[A-G](#|b)?)?$/;
-        return padraoAcorde.test(limpo);
+    function ehUmAcorde(token){
+        token = token.trim().replace(/[()[\]]/g,'');
+        return /^([A-G])([#b]?)(maj7|maj9|maj|min|m|dim7|dim|aug|sus2|sus4|7sus4|add9|add11|6|7|9|11|13|m6|m7|m9|m11|m13|m7b5|5)?(\/[A-G][#b]?)?$/.test(token);
     }
 
     function ehLinhaDeAcordes(linha) {
@@ -1105,39 +959,43 @@ function AppObterIndexAjustado(texto, palavra, start) {
     return pos === -1 ? start : pos;
 }
 
-function detectarTomAutomaticamente(estrutura) {
-    const contagem = {};
-
+function extrairAcordesDaEstrutura(estrutura) {
+    const acordes = [];
     estrutura.forEach(linha => {
-        linha.forEach(palavra => {
-            if (!palavra.acorde) return;
-            let acorde = palavra.acorde;
-            acorde = acorde.split("/")[0];
-            acorde = acorde.replace(/(maj7|maj9|maj13|m7|m9|7|9|11|13|sus2|sus4|add9|add11|dim7|dim|aug|\+|°|5|6\/9|7sus4)/g, "");
-
-            if (!contagem[acorde]) contagem[acorde] = 0;
-            contagem[acorde]++;
+        linha.forEach(p => {
+            if (p.acorde) {
+                acordes.push(p.acorde);
+            }
         });
     });
+    return acordes;
+}
 
-    let maisUsado = "C";
-    let maiorQtd = 0;
-
-    Object.keys(contagem).forEach(acorde => {
-        if (contagem[acorde] > maiorQtd) {
-            maiorQtd = contagem[acorde];
-            maisUsado = acorde;
-        }
+function detectarTomAutomaticamente(estrutura) {
+    const contagem = {};
+    extrairAcordesDaEstrutura(estrutura).forEach(ac => {
+        const base = ac.match(/^[A-G][#b]?m?/);
+        if (!base) return;
+        const acorde = base[0];
+        contagem[acorde] = (contagem[acorde] || 0) + 1;
     });
 
-    return maisUsado;
+    let maior = "";
+    let quantidade = 0;
+    for (const acorde in contagem) {
+        if (contagem[acorde] > quantidade) {
+            quantidade = contagem[acorde];
+            maior = acorde;
+        }
+    }
+    return maior || "C";
 }
 
 function avancarParaEditor(){
     const idEdicao = document.getElementById('cad-id-edicao').value;
     const nome = document.getElementById('cad-nome').value.trim();
     const cantor = document.getElementById('cad-cantor').value.trim();
-    const tomBase = document.getElementById('cad-tom').value;
+    let tomBase = document.getElementById('cad-tom').value;
     const letraBruta = document.getElementById('cad-letra').value;
     const temasSelecionados = [...document.querySelectorAll('input[name="temas-cad"]:checked')].map(cb=>cb.value);
 
@@ -1148,6 +1006,8 @@ function avancarParaEditor(){
 
     const linhasTratadas = processarTextoECifrasAutomatico(letraBruta);
     const tomDetectado = detectarTomAutomaticamente(linhasTratadas);
+
+    tomBase = tomDetectado;
     document.getElementById("cad-tom").value = tomDetectado;
 
     musicaEmConstrucao = {
@@ -1177,7 +1037,7 @@ function renderizarPainelEditorGrade() {
             
             box.onclick = (e)=>{
                 e.stopPropagation();
-                alvoPalavra = { linha: lIdx, word: pIdx, palavra: pIdx }; 
+                alvoPalavra = { linha: lIdx, palavra: pIdx }; 
                 const seletor = document.getElementById('seletor-flutuante');
                 seletor.style.display = 'grid';
             };
@@ -1213,7 +1073,23 @@ function renderizarPainelEditorGrade() {
     const menuf = document.getElementById('seletor-flutuante');
     menuf.innerHTML = '';
 
-    acordesRapidos.forEach(ac=>{
+    const btnFecharPainel = document.createElement('button');
+    btnFecharPainel.innerText = '✕ Fechar Painel';
+    btnFecharPainel.style.gridColumn = '1 / -1';
+    btnFecharPainel.style.background = 'rgba(255, 255, 255, 0.1)';
+    btnFecharPainel.onclick = (e)=>{
+        e.stopPropagation();
+        menuf.style.display = 'none';
+    };
+    menuf.appendChild(btnFecharPainel);
+
+    const favoritos = [
+        "C","Cm","D","Dm","E","Em","F","Fm","G","Gm","A","Am","B","Bm",
+        "C7","D7","E7","F7","G7","A7","B7","Cmaj7","Dmaj7","Fmaj7","Gmaj7",
+        "Cm7","Dm7","Em7","Am7","Csus4","Dsus4","Gsus4","Cadd9","Dadd9","Gadd9"
+    ];
+
+    favoritos.forEach(ac=>{
         const b = document.createElement('button');
         b.innerText = ac;
         b.setAttribute('draggable', 'true'); 
@@ -1242,7 +1118,8 @@ function renderizarPainelEditorGrade() {
         document.getElementById('seletor-flutuante').style.display = 'none';
     };
     menuf.appendChild(btnRemover);
-    menuf.style.display = 'grid';
+    
+    menuf.style.display = 'none';
 }
 
 function aplicarAcordeEditor(valorAcorde) {
@@ -1255,7 +1132,7 @@ function aplicarAcordeEditor(valorAcorde) {
 }
 
 function finalizarESalvar(){
-    const indexExistente = bancoMusicas.findIndex(m => m.id === musicaEmConstrucao.id);
+    const indexExistente = bancoMusicas.findIndex(m => Number(m.id) === Number(musicaEmConstrucao.id));
     if(indexExistente > -1) {
         bancoMusicas[indexExistente] = musicaEmConstrucao;
     } else {
@@ -1268,7 +1145,7 @@ function finalizarESalvar(){
 }
 
 function iniciarEdicaoCifra(id) {
-    const musica = bancoMusicas.find(m => m.id === id);
+    const musica = bancoMusicas.find(m => Number(m.id) === Number(id));
     if(!musica) return;
 
     document.getElementById('titulo-cadastro').innerText = "Editar Música";
@@ -1292,8 +1169,9 @@ function iniciarEdicaoCifra(id) {
 
 function excluirCifraDoBanco(id) {
     if(confirm("Deseja apagar permanentemente esta cifra do banco global?")) {
-        bancoMusicas = bancoMusicas.filter(m => m.id !== id);
-        playlistsCofre.forEach(p => p.musicas = p.musicas.filter(mid => mid !== id));
+        const idNum = Number(id);
+        bancoMusicas = bancoMusicas.filter(m => Number(m.id) !== idNum);
+        playlistsCofre.forEach(p => p.musicas = p.musicas.filter(mid => Number(mid) !== idNum));
         
         localStorage.setItem('banco_cifras_v3', JSON.stringify(bancoMusicas));
         localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
@@ -1380,7 +1258,7 @@ function renderizarItensPlaylistOrdenaveis() {
     }
 
     play.musicas.forEach((mId, index) => {
-        const m = bancoMusicas.find(mus => mus.id === mId);
+        const m = bancoMusicas.find(mus => Number(mus.id) === Number(mId));
         if(!m) return;
 
         const div = document.createElement('div');
@@ -1436,9 +1314,8 @@ function removerMusicaDaPlaylistEstrategico(index) {
 
 function abrirProcurarCifra(){
     exibirModoPastas();
-    document.getElementById('lista-cifras-renderizada').innerHTML = '';
     document.getElementById('busca-input').value = '';
-    document.getElementById('bloco-lista-musicas').style.display = 'none';
+    filtrarPorTexto();
     navegarPara('tela-busca');
 }
 
@@ -1468,12 +1345,13 @@ function filtrarPorTexto(){
     const termo = document.getElementById('busca-input').value.toLowerCase().trim();
     const bloco = document.getElementById('bloco-lista-musicas');
 
+    bloco.style.display = 'block';
+
     if(termo === ''){
-        bloco.style.display = 'none';
+        renderizarLinhasDeMusica(bancoMusicas);
         return;
     }
 
-    bloco.style.display = 'block';
     const termosFracionados = termo.split(/\s+/);
 
     const filtradas = bancoMusicas.filter(m => {
@@ -1506,16 +1384,30 @@ function renderizarMusicasTema(lista){
         return;
     }
 
+    let playlistOptions = '';
+    playlistsCofre.forEach(function(p) {
+        playlistOptions += '<option value="' + p.id + '">' + p.nome + '</option>';
+    });
+
     lista.forEach(m=>{
         const div = document.createElement('div');
         div.className = 'item-busca';
         div.onclick = () => abrirVisualizador(m.id, 'tela-tema');
         div.innerHTML = `
-            <div>
-                <strong style="font-size:0.95rem;">${m.nome}</strong><br>
-                <span style="color:var(--texto-escuro); font-size:0.8rem;">${m.cantor || 'Intérprete Não Informado'}</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:15px;">
+            <div style="flex:1; min-width:0;">
+                <div style="font-size:0.95rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.nome}</div>
+                <div style="font-size:0.8rem; color:var(--texto-escuro);">${m.cantor || 'Intérprete Não Informado'}</div>
             </div>
-        `;
+            <div class="item-acoes">
+                <button class="info" onclick="event.stopPropagation(); iniciarEdicaoCifra(${m.id})">✏️</button>
+                <button class="perigo" onclick="event.stopPropagation(); excluirCifraDoBanco(${m.id})">🗑️</button>
+                <select style="width:120px; padding:6px 10px; font-size:0.75rem;" onclick="event.stopPropagation();" onchange="vincularMusicaNaPlaylistAbaBusca(${m.id}, this)">
+                     <option value="">+ Playlist...</option>
+                     ${playlistOptions}
+                </select>
+            </div>
+        </div>`;
         container.appendChild(div);
     });
 }
@@ -1565,15 +1457,38 @@ function vincularMusicaNaPlaylistAbaBusca(musicaId, seletorElemento) {
 
     const playlistAlvo = playlistsCofre.find(p => p.id === playId);
     if(!playlistAlvo) return;
-    if(playlistAlvo.musicas.includes(musicaId)) {
+
+    const idNum = Number(musicaId);
+    const listaNormalizada = playlistAlvo.musicas.map(Number);
+
+    if(listaNormalizada.includes(idNum)) {
         alert(`Esta música já faz parte da playlist: ${playlistAlvo.nome}`);
     } else {
-        playlistAlvo.musicas.push(musicaId);
+        playlistAlvo.musicas.push(idNum);
         localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
-        alert(`Adicionada com sucesso em ${playlistAlvo.nome}!`);
+        alert(`Adicionada com sucesso em "${playlistAlvo.nome}"!`);
         atualizarContadoresInterface();
     }
     seletorElemento.value = "";
+}
+
+function adicionarMusicaAtualAPlaylist(playId) {
+    if(!playId || !musicaAtivaVisualizacao) return;
+    const playlistAlvo = playlistsCofre.find(p => p.id === playId);
+    if(!playlistAlvo) return;
+
+    const idNum = Number(musicaAtivaVisualizacao.id);
+    const listaNormalizada = playlistAlvo.musicas.map(Number);
+
+    if(listaNormalizada.includes(idNum)) {
+        alert(`Esta música já faz parte da playlist: ${playlistAlvo.nome}`);
+    } else {
+        playlistAlvo.musicas.push(idNum);
+        localStorage.setItem('playlists_v4', JSON.stringify(playlistsCofre));
+        alert(`Adicionada com sucesso em "${playlistAlvo.nome}"!`);
+        atualizarContadoresInterface();
+    }
+    document.getElementById('seletor-add-playlist-view').value = "";
 }
 
 function transporAcorde(acorde, semitons){
@@ -1581,7 +1496,7 @@ function transporAcorde(acorde, semitons){
     return acorde.split(' ').map(ac => {
         const partes = ac.split('/');
         return partes.map(parte => {
-            const match = parte.match(/^([A-G][#b]?)(.*)/);
+            const match = parte.match(/^([A-G]#?|b?)(.*)/);
             if(!match) return parte;
 
             let notaBase = match[1];
@@ -1605,12 +1520,10 @@ function transporAcorde(acorde, semitons){
 }
 
 function abrirVisualizador(id, origem){
-    musicaAtivaVisualizacao = bancoMusicas.find(m=>m.id === id);
+    musicaAtivaVisualizacao = bancoMusicas.find(m => Number(m.id) === Number(id));
     if(!musicaAtivaVisualizacao) return;
     
     deslocamentoTomAtual = 0;
-    preencherSeletorTom();
-    document.getElementById("seletor-tom").value = musicaAtivaVisualizacao.tomBase;
     capoAtual = 0;
     exibirCifrasNoPainel = true; 
     document.getElementById('seletor-capo').value = "0";
@@ -1624,8 +1537,13 @@ function abrirVisualizador(id, origem){
 
     resetMecanismoScroll();
     renderizarCifraPronta();
-    if(modoPalcoAtivo) { atualizarMetadadosPalcoProximaMusica(); }
     navegarPara('tela-visualizar');
+}
+
+function desativarModoPalcoForçado() {
+    modoPalcoAtivo = false;
+    document.body.classList.remove('modo-palco-global');
+    document.getElementById('btn-modo-palco-toggle').innerText = "🎦 Modo Palco";
 }
 
 function voltarDoVisualizador(){
@@ -1638,37 +1556,42 @@ function voltarDoVisualizador(){
     }
 }
 
-function preencherSeletorTom() {
-    const select = document.getElementById("seletor-tom");
-    select.innerHTML = "";
-
-    textOptions = "";
-    listaTons.forEach(tom => {
-        const option = document.createElement("option");
-        option.value = tom;
-        option.textContent = tom;
-        select.appendChild(option);
-    });
-}
-
-function trocarTomSelecionado(novoTom){
-    const tomOriginal = musicaAtivaVisualizacao.tomBase;
-
-    const notaOriginal = tomOriginal.replace("m","");
-    const notaNova = novoTom.replace("m","");
-
-    const indiceOriginal = escalaCromatica.indexOf(notaOriginal);
-    const indiceNovo = escalaCromatica.indexOf(notaNova);
-
-    if(indiceOriginal === -1 || indiceNovo === -1) return;
-
-    deslocamentoTomAtual = indiceNovo - indiceOriginal;
-    renderizarCifraPronta();
-}
-
 function ajustarTom(direcao){
     deslocamentoTomAtual += direcao;
     renderizarCifraPronta();
+}
+
+function mudarTomSelecionado(){
+    const novoTom = document.getElementById("seletorTom").value;
+    if(!musicaAtivaVisualizacao) return;
+    const tomOriginal = musicaAtivaVisualizacao.tomBase;
+    const distancia = calcularDistanciaTom(tomOriginal, novoTom);
+    deslocamentoTomAtual = distancia;
+    renderizarCifraPronta();
+}
+
+function calcularDistanciaTom(origem, destino){
+    const tons = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+
+    let raizOrigem = origem ? (origem.match(/^[A-G][#b]?/)?.[0] || 'C') : 'C';
+    let raizDestino = destino ? (destino.match(/^[A-G][#b]?/)?.[0] || 'C') : 'C';
+
+    const bemoles = { 'Db':'C#', 'Eb':'D#', 'Gb':'F#', 'Ab':'G#', 'Bb':'A#' };
+    if(bemoles[raizOrigem]) raizOrigem = bemoles[raizOrigem];
+    if(bemoles[raizDestino]) raizDestino = bemoles[raizDestino];
+
+    let posOrigem = tons.indexOf(raizOrigem);
+    let posDestino = tons.indexOf(raizDestino);
+
+    if(posOrigem === -1) posOrigem = 0;
+    if(posDestino === -1) posDestino = 0;
+
+    let distancia = posDestino - posOrigem;
+
+    if(distancia > 6) distancia -= 12;
+    if(distancia < -6) distancia += 12;
+
+    return distancia;
 }
 
 function alterarCapo(casaFret) {
@@ -1689,7 +1612,7 @@ function ajustarZoom(fator) {
 function salvarTomAtualComoDefinitivo() {
     if (deslocamentoTomAtual === 0 || !musicaAtivaVisualizacao) return;
     if (confirm(`Deseja salvar esta partitura alterada permanentemente para o tom atual?`)) {
-        const index = bancoMusicas.findIndex(m => m.id === musicaAtivaVisualizacao.id);
+        const index = bancoMusicas.findIndex(m => Number(m.id) === Number(musicaAtivaVisualizacao.id));
         if (index === -1) return;
 
         bancoMusicas[index].estrutura = bancoMusicas[index].estrutura.map(linha => {
@@ -1721,6 +1644,26 @@ function renderizarCifraPronta(){
         infoApoioInstrumento += ` | (Capo ${capoAtual}ª casa: Formato em ${transporAcorde(tomRealOuvido, -capoAtual)})`;
     }
     document.getElementById('view-detalhes').innerText = infoApoioInstrumento;
+    
+    let tomCalculado = transporAcorde(m.tomBase, deslocamentoTomAtual);
+    let raizTomCalculado = tomCalculado ? (tomCalculado.match(/^[A-G][#b]?/)?.[0] || 'C') : 'C';
+    const bemoles = { 'Db':'C#', 'Eb':'D#', 'Gb':'F#', 'Ab':'G#', 'Bb':'A#' };
+    if(bemoles[raizTomCalculado]) raizTomCalculado = bemoles[raizTomCalculado];
+
+    const seletorTom = document.getElementById("seletorTom");
+    if(seletorTom) {
+        seletorTom.value = raizTomCalculado;
+    }
+
+    const seletorAddView = document.getElementById('seletor-add-playlist-view');
+    if(seletorAddView) {
+        seletorAddView.innerHTML = '<option value="">+ Add ao Repertório...</option>';
+        playlistsCofre.forEach(p => {
+            seletorAddView.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+        });
+    }
+
+    document.getElementById('txt-tom-relativo').innerText = `(${deslocamentoTomAtual >= 0 ? '+' : ''}${deslocamentoTomAtual})`;
 
     const btnSalvarTom = document.getElementById('btn-salvar-novo-tom');
     btnSalvarTom.style.display = (deslocamentoTomAtual !== 0) ? "inline-flex" : "none";
@@ -1787,7 +1730,7 @@ function dispararTransicaoMusicaPlaylist(direcao) {
     const listaIds = obtenerPlaylistAtivaVetorEstrategico();
     if(listaIds.length <= 1 || !musicaAtivaVisualizacao) return;
 
-    let idxAtual = listaIds.indexOf(musicaAtivaVisualizacao.id);
+    let idxAtual = listaIds.findIndex(id => Number(id) === Number(musicaAtivaVisualizacao.id));
     if(idxAtual === -1) return;
 
     let novoIdx = idxAtual + direcao;
@@ -1857,10 +1800,10 @@ function pararAutoScroll() {
 }
 
 function mudarVelocidadeScroll(fator) {
-    let novaVelocidadeCalculada = velocidadScrollAtual + fator;
-    if (novaVelocidadeCalculada < 1) novaVelocidadeCalculada = 1;
-    if (novaVelocidadeCalculada > 5) novaVelocidadeCalculada = 5;
-    velocidadScrollAtual = novaVelocidadeCalculada;
+    let novaVelocidade = velocidadScrollAtual + fator;
+    if (novaVelocidade < 1) novaVelocidade = 1;
+    if (novaVelocidade > 5) novaVelocidade = 5;
+    velocidadScrollAtual = novaVelocidade;
     document.getElementById('txt-velocidade-scroll').innerText = velocidadScrollAtual + "x";
     if (executandoScroll) {
         pararAutoScroll();
@@ -1871,6 +1814,7 @@ function mudarVelocidadeScroll(fator) {
 document.addEventListener('click', (e) => {
     const seletor = document.getElementById('seletor-flutuante');
     if(!seletor) return;
+    if(document.getElementById('tela-editor').classList.contains('ativa')) return;
     
     if(!e.target.closest('.palavra-box') && !e.target.closest('.seletor-acordes')) {
         seletor.style.display = 'none';
@@ -1891,6 +1835,7 @@ window.addEventListener('popstate', (event) => {
         navegarPara(event.state.tela, true);
     }
 });
+
 </script>
 
 </body>
